@@ -8,3 +8,9 @@ Evaluation of WMFP metrics for Golang code. It can be used for approximation of 
 
 ## RUP filled template
 [Link](https://docs.google.com/document/d/1su-LKhZ33DbZ898iwvInVrTbZTy12idO/edit?usp=sharing&ouid=106194539643127537689&rtpof=true&sd=true)
+
+## Authors
+* Kirill Ivanov
+* Anatoliy Baskakov
+* Iskander Bakhtiyarov
+* Ivan Rybin
