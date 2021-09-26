@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	_ "github.com/bragov4ik/go-kys/pkg/kys"
 	"log"
 	"os"
 	"path/filepath"
