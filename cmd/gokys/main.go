@@ -4,31 +4,33 @@ import (
 	"flag"
 	"fmt"
 	_ "github.com/bragov4ik/go-kys/pkg/kys"
+	"log"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func main() {
-	var fileNames string
-	var directory string
-
-	flag.StringVar(&fileNames, "f", "", "Files to count metrics for")
-	flag.StringVar(&directory, "d", "", "Name of the directory for recursive scanning")
 	flag.Parse()
+	args := flag.Args()
 
 	var files []string
-	var err error
 
-	if directory == "" {
-		files = strings.Split(fileNames, " ")
-	} else {
-		files, err = WalkMatch(directory, "*.go")
-	}
+	for _, v := range args {
+		info, err := os.Stat(v)
 
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		if os.IsNotExist(err) {
+			log.Fatal("File does not exist.")
+		}
+
+		if info.IsDir() {
+			files, err = WalkMatch(v, "*.go")
+		} else {
+			files = append(files, v)
+		}
+
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	fmt.Println(files)
