@@ -14,9 +14,9 @@ Evaluation of WMFP metrics for Golang code. It can be used for approximation of 
 
 ## CLI Usage
 ```console
-$ ./gokys -f a.go # calculates for file
-$ ./gokys -d . # calculates for project
-$ ./gokys -f "a.go b.go c.go" # calculates for multiple files
+$ ./gokys a.go # calculates for file
+$ ./gokys . # calculates for project
+$ ./gokys a.go b.go c.go # calculates for multiple files
 ```
 
 ## RUP filled template
