@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -26,14 +27,17 @@ func main() {
 			log.Fatal("File does not exist.")
 		}
 
-		if info.IsDir() {
-			files, err = WalkMatch(v, "*.go")
-		} else {
-			files = append(files, v)
-		}
-
 		if err != nil {
 			log.Fatal(err)
+		}
+
+		if info.IsDir() {
+			files, err = WalkMatch(v, "*.go")
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			files = append(files, v)
 		}
 	}
 
@@ -54,7 +58,7 @@ func main() {
 
 func WalkMatch(root, pattern string) ([]string, error) {
 	var matches []string
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
