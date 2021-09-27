@@ -2,7 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"go/ast"
+	"go/parser"
+	"go/token"
 	"log"
 	"os"
 	"path/filepath"
@@ -31,6 +34,20 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+
+	fset := token.NewFileSet()
+	scores := make(map[string]int)
+	scoresPtr := &scores
+
+	for _, file := range files {
+		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
+		if err != nil {
+			log.Fatal(err)
+		}
+		WMFPcalc(node, scoresPtr)
+	}
+
+	fmt.Println(scores)
 
 }
 
