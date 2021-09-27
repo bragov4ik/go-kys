@@ -37,14 +37,13 @@ func main() {
 
 	fset := token.NewFileSet()
 	scores := make(map[string]int)
-	scoresPtr := &scores
 
 	for _, file := range files {
 		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
 		if err != nil {
 			log.Fatal(err)
 		}
-		WMFPcalc(node, scoresPtr)
+		WMFPcalc(node, scores)
 	}
 
 	fmt.Println(scores)
@@ -73,30 +72,30 @@ func WalkMatch(root, pattern string) ([]string, error) {
 	return matches, nil
 }
 
-func WMFPcalc(file *ast.File, score *map[string]int) {
+func WMFPcalc(file *ast.File, score map[string]int) {
 	ast.Inspect(file, func(n ast.Node) bool {
 		// Find function declarations
 		_, ok := n.(*ast.FuncDecl)
 		if ok {
-			(*score)["funcDecl"]++
+			score["funcDecl"]++
 			return true
 		}
 		// Find return statements
 		_, ok = n.(*ast.ReturnStmt)
 		if ok {
-			(*score)["returnStmt"]++
+			score["returnStmt"]++
 			return true
 		}
 		// Find function calls
 		_, ok = n.(*ast.CallExpr)
 		if ok {
-			(*score)["callExpr"]++
+			score["callExpr"]++
 			return true
 		}
 		// Find assignment statements
 		_, ok = n.(*ast.AssignStmt)
 		if ok {
-			(*score)["assignStmt"]++
+			score["assignStmt"]++
 		}
 		return true
 	})
