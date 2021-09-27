@@ -1,9 +1,15 @@
 # Go knowledge yield summary
 
+## Glossary
+Weighted Micro Function Points ([WMFP](https://en.wikipedia.org/wiki/Weighted_Micro_Function_Points)) - a modern software sizing algorithm
+
 ## Project description
+Evaluation of WMFP metrics for Golang code. It can be used for approximation of software size and measuring similar software development's the cost.
+
 Project developed for the course Software Systems Analysis and Design (SSAD) at IU in F21 semester.
 
-Evaluation of WMFP metrics for Golang code. It can be used for approximation of software size and measuring similar software development's the cost.
+## Importance
+Software metrics help to estimate size, price, or time consumption of a software. There are no known open source solutions for counting the WMFP metrics, especially for Go. Thus, having a free alternative to proprietary software can be in demand.
 
 ## Features
 * Count WMFP metric for a given golang source file
