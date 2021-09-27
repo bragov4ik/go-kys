@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"go/ast"
 	"log"
 	"os"
@@ -33,7 +32,6 @@ func main() {
 		}
 	}
 
-	fmt.Println(files)
 }
 
 func WalkMatch(root, pattern string) ([]string, error) {
@@ -58,33 +56,31 @@ func WalkMatch(root, pattern string) ([]string, error) {
 	return matches, nil
 }
 
-func WMFPcalc(file *ast.File) map[string]int {
-	score := make(map[string]int)
+func WMFPcalc(file *ast.File, score *map[string]int) {
 	ast.Inspect(file, func(n ast.Node) bool {
 		// Find function declarations
 		_, ok := n.(*ast.FuncDecl)
 		if ok {
-			score["funcDecl"]++
+			(*score)["funcDecl"]++
 			return true
 		}
 		// Find return statements
 		_, ok = n.(*ast.ReturnStmt)
 		if ok {
-			score["returnStmt"]++
+			(*score)["returnStmt"]++
 			return true
 		}
 		// Find function calls
 		_, ok = n.(*ast.CallExpr)
 		if ok {
-			score["callExpr"]++
+			(*score)["callExpr"]++
 			return true
 		}
 		// Find assignment statements
 		_, ok = n.(*ast.AssignStmt)
 		if ok {
-			score["assignStmt"]++
+			(*score)["assignStmt"]++
 		}
 		return true
 	})
-	return score
 }
