@@ -4,9 +4,9 @@
 Weighted Micro Function Points ([WMFP](https://en.wikipedia.org/wiki/Weighted_Micro_Function_Points)) - a modern software sizing algorithm
 
 ## Project description
-Evaluation of WMFP metrics for Golang code. It can be used for approximation of software size and measuring similar software development's the cost.
+Evaluation of WMFP metrics for given Golang code. Implemented in Go.
 
-Project developed for the course Software Systems Analysis and Design (SSAD) at IU in F21 semester.
+Project developed for the course Software Systems Analysis and Design (SSAD) at Innopolis University in F21 semester.
 
 ## Importance
 Software metrics help to estimate size, price, or time consumption of a software. There are no known open source solutions for counting the WMFP metrics, especially for Go. Thus, having a free alternative to proprietary software can be in demand.
