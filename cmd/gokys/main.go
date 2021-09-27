@@ -2,13 +2,15 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"github.com/bragov4ik/go-kys/pkg/kys"
-	"go/parser"
-	"go/token"
 	"log"
 	"os"
 	"path/filepath"
+
+	"go/parser"
+	"go/token"
+
+	"github.com/bragov4ik/go-kys/pkg/kys"
+	"github.com/k0kubun/pp"
 )
 
 func main() {
@@ -36,17 +38,17 @@ func main() {
 	}
 
 	fset := token.NewFileSet()
-	scores := make(map[string]int)
+	scores := kys.Info{}
 
 	for _, file := range files {
 		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
 		if err != nil {
 			log.Fatal(err)
 		}
-		kys.WMFPcalc(node, scores)
+		kys.GetInfo(node, &scores)
 	}
 
-	fmt.Println(scores)
+	pp.Println(scores)
 
 }
 
