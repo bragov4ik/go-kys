@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"log"
 	"os"
 	"path/filepath"
@@ -32,7 +35,20 @@ func main() {
 		}
 	}
 
-	fmt.Println(files)
+	fset := token.NewFileSet()
+	scores := make(map[string]int)
+	scoresPtr := &scores
+
+	for _, file := range files {
+		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
+		if err != nil {
+			log.Fatal(err)
+		}
+		WMFPcalc(node, scoresPtr)
+	}
+
+	fmt.Println(scores)
+
 }
 
 func WalkMatch(root, pattern string) ([]string, error) {
@@ -55,4 +71,33 @@ func WalkMatch(root, pattern string) ([]string, error) {
 		return nil, err
 	}
 	return matches, nil
+}
+
+func WMFPcalc(file *ast.File, score *map[string]int) {
+	ast.Inspect(file, func(n ast.Node) bool {
+		// Find function declarations
+		_, ok := n.(*ast.FuncDecl)
+		if ok {
+			(*score)["funcDecl"]++
+			return true
+		}
+		// Find return statements
+		_, ok = n.(*ast.ReturnStmt)
+		if ok {
+			(*score)["returnStmt"]++
+			return true
+		}
+		// Find function calls
+		_, ok = n.(*ast.CallExpr)
+		if ok {
+			(*score)["callExpr"]++
+			return true
+		}
+		// Find assignment statements
+		_, ok = n.(*ast.AssignStmt)
+		if ok {
+			(*score)["assignStmt"]++
+		}
+		return true
+	})
 }
