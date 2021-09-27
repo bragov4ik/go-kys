@@ -35,6 +35,7 @@ func main() {
 		}
 	}
 
+
 	fset := token.NewFileSet()
 	scores := make(map[string]int)
 	scoresPtr := &scores
