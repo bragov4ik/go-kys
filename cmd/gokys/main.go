@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/xml"
 	"flag"
 	"io/fs"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -41,9 +43,33 @@ func main() {
 		}
 	}
 
+	xmlConfig, err := os.Open("../../config.xml")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// defer the closing of our xmlFile so that we can parse it later on
+	defer func(xmlConfig *os.File) {
+		err := xmlConfig.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(xmlConfig)
+
+	byteValue, err := ioutil.ReadAll(xmlConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var config kys.Config
+
+	// get config from config.xml file
+	err = xml.Unmarshal(byteValue, &config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	fset := token.NewFileSet()
 	scores := kys.Info{}
-	config := kys.Config{}
 
 	for _, file := range files {
 		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
