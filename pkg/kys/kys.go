@@ -2,6 +2,7 @@ package kys
 
 import (
 	"go/ast"
+	"go/token"
 
 	"github.com/k0kubun/pp"
 )
@@ -50,4 +51,29 @@ func GetInfo(file *ast.File, info *Info) {
 		parseNode(n, info)
 		return true
 	})
+}
+
+type branchVisitor func(n ast.Node) (w ast.Visitor)
+
+func (v branchVisitor) Visit(n ast.Node) (w ast.Visitor) {
+	return v(n)
+}
+
+func calcCycloComp(fd *ast.FuncDecl) uint {
+	var comp uint = 1
+	var v ast.Visitor
+	v = branchVisitor(func(n ast.Node) (w ast.Visitor) {
+		switch n := n.(type) {
+		case *ast.IfStmt, *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
+			comp++
+		case *ast.BinaryExpr:
+			if n.Op == token.LAND || n.Op == token.LOR {
+				comp++
+			}
+		}
+		return v
+	})
+	ast.Walk(v, fd)
+
+	return comp
 }
