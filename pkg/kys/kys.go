@@ -3,6 +3,7 @@ package kys
 import (
 	"go/ast"
 
+	comments "github.com/bragov4ik/go-kys/pkg/comments"
 	cyclo "github.com/bragov4ik/go-kys/pkg/cyclocomp"
 	"github.com/k0kubun/pp"
 )
@@ -13,16 +14,18 @@ type Info struct {
 	ReturnStmt uint
 	CallExpr   uint
 	AssignStmt uint
+	Comments   uint
 }
 
 type Config struct {
-	CycloComp cyclo.Weights `xml:"cyclomatic"`
+	CycloComp cyclo.Weights    `xml:"cyclomatic"`
+	Comment   comments.Weights `xml:"comment"`
 }
 
-func parseNode(n ast.Node, info *Info, config *Config) {
+func parseNode(n ast.Node, info *Info, cfg *Config) {
 	switch v := n.(type) {
 	case *ast.FuncDecl:
-		info.CycloComp += cyclo.GetCycloComp(v, &config.CycloComp)
+		info.CycloComp += cyclo.GetCycloComp(v, &cfg.CycloComp)
 	case *ast.FuncLit:
 		info.FuncLit++
 	case *ast.ReturnStmt:
@@ -31,6 +34,8 @@ func parseNode(n ast.Node, info *Info, config *Config) {
 		info.CallExpr++
 	case *ast.AssignStmt:
 		info.AssignStmt++
+	case *ast.Comment:
+		info.Comments += comments.GetCommentComp(v, &cfg.Comment)
 
 	case *ast.BlockStmt:
 		// Should we parse blocks?
