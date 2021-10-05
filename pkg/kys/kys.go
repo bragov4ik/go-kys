@@ -1,11 +1,12 @@
 package kys
 
 import (
+	"fmt"
 	"go/ast"
 
 	comments "github.com/bragov4ik/go-kys/pkg/comments"
 	cyclo "github.com/bragov4ik/go-kys/pkg/cyclocomp"
-	"github.com/k0kubun/pp"
+	"github.com/k0kubun/pp/v3"
 )
 
 type Info struct {
@@ -50,7 +51,8 @@ func parseNode(n ast.Node, info *Info, cfg *Config) {
 	case *ast.File:
 	default:
 		if n != nil {
-			pp.Printf("Unhandled type: %T %v\n", v, n)
+			fmt.Printf("Unhandled type: %T ", v)
+			pp.Printf("%v\n", n)
 		}
 	}
 }
