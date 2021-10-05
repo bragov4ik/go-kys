@@ -16,7 +16,7 @@ type Info struct {
 }
 
 type Config struct {
-	cycloCompWeights CycloCompWeights
+	CyclomaticWeights CycloCompWeights
 }
 type CycloCompWeights struct {
 	IF   uint
@@ -77,20 +77,20 @@ func calcCycloComp(fd *ast.FuncDecl, config *Config) uint {
 	v = branchVisitor(func(n ast.Node) (w ast.Visitor) {
 		switch n := n.(type) {
 		case *ast.IfStmt:
-			comp += config.cycloCompWeights.IF
+			comp += config.CyclomaticWeights.IF
 		case *ast.ForStmt:
-			comp += config.cycloCompWeights.FOR
+			comp += config.CyclomaticWeights.FOR
 		case *ast.RangeStmt:
-			comp += config.cycloCompWeights.RNG
+			comp += config.CyclomaticWeights.RNG
 		case *ast.CaseClause:
-			comp += config.cycloCompWeights.CASE
+			comp += config.CyclomaticWeights.CASE
 		case *ast.CommClause:
-			comp += config.cycloCompWeights.CASE
+			comp += config.CyclomaticWeights.CASE
 		case *ast.BinaryExpr:
 			if n.Op == token.LAND {
-				comp += config.cycloCompWeights.AND
+				comp += config.CyclomaticWeights.AND
 			} else if n.Op == token.LOR {
-				comp += config.cycloCompWeights.OR
+				comp += config.CyclomaticWeights.OR
 			}
 		}
 		return v
