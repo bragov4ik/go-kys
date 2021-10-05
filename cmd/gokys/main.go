@@ -29,53 +29,39 @@ func main() {
 			log.Fatal("File does not exist.")
 		}
 
-		if err != nil {
-			log.Fatal(err)
-		}
+		die(err)
 
 		if info.IsDir() {
 			files, err = WalkMatch(v, "*.go")
-			if err != nil {
-				log.Fatal(err)
-			}
+			die(err)
 		} else {
 			files = append(files, v)
 		}
 	}
 
 	xmlConfig, err := os.Open("../../config.xml")
-	if err != nil {
-		log.Fatal(err)
-	}
+	die(err)
 	// defer the closing of our xmlFile so that we can parse it later on
 	defer func(xmlConfig *os.File) {
 		err := xmlConfig.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
+		die(err)
 	}(xmlConfig)
 
 	byteValue, err := ioutil.ReadAll(xmlConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	die(err)
 
 	var config kys.Config
 
 	// get config from config.xml file
 	err = xml.Unmarshal(byteValue, &config)
-	if err != nil {
-		log.Fatal(err)
-	}
+	die(err)
 
 	fset := token.NewFileSet()
 	scores := kys.Info{}
 
 	for _, file := range files {
 		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
-		if err != nil {
-			log.Fatal(err)
-		}
+		die(err)
 		kys.GetInfo(node, &scores, &config)
 	}
 
@@ -86,9 +72,7 @@ func main() {
 func WalkMatch(root, pattern string) ([]string, error) {
 	var matches []string
 	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
+		die(err)
 		if info.IsDir() {
 			return nil
 		}
@@ -99,8 +83,13 @@ func WalkMatch(root, pattern string) ([]string, error) {
 		}
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
+	die(err)
 	return matches, nil
+}
+
+// error handling
+func die(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }
