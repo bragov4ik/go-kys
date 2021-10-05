@@ -16,45 +16,41 @@ import (
 	"github.com/k0kubun/pp"
 )
 
-func main() {
-	flag.Parse()
-	args := flag.Args()
+var cfgpath = flag.String("c", "config.xml", "XML config")
 
+func readCfg() kys.Config {
+	file, err := os.Open(*cfgpath)
+	die(err)
+	defer func(cfg *os.File) { die(cfg.Close()) }(file)
+	bytes, err := ioutil.ReadAll(file)
+	die(err)
+
+	var cfg kys.Config
+	die(xml.Unmarshal(bytes, &cfg))
+	return cfg
+}
+
+func getFiles(args []string) []string {
 	var files []string
 
 	for _, v := range args {
 		info, err := os.Stat(v)
-
-		if os.IsNotExist(err) {
-			log.Fatal("File does not exist.")
-		}
-
 		die(err)
 
 		if info.IsDir() {
-			files, err = WalkMatch(v, "*.go")
+			files, err = walkMatch(v, "*.go")
 			die(err)
 		} else {
 			files = append(files, v)
 		}
 	}
+	return files
+}
 
-	xmlConfig, err := os.Open("../../config.xml")
-	die(err)
-	// defer the closing of our xmlFile so that we can parse it later on
-	defer func(xmlConfig *os.File) {
-		err := xmlConfig.Close()
-		die(err)
-	}(xmlConfig)
-
-	byteValue, err := ioutil.ReadAll(xmlConfig)
-	die(err)
-
-	var config kys.Config
-
-	// get config from config.xml file
-	err = xml.Unmarshal(byteValue, &config)
-	die(err)
+func main() {
+	flag.Parse()
+	cfg := readCfg()
+	files := getFiles(flag.Args())
 
 	fset := token.NewFileSet()
 	scores := kys.Info{}
@@ -62,17 +58,19 @@ func main() {
 	for _, file := range files {
 		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
 		die(err)
-		kys.GetInfo(node, &scores, &config)
+		kys.GetInfo(node, &scores, &cfg)
 	}
 
 	pp.Println(scores)
-
 }
 
-func WalkMatch(root, pattern string) ([]string, error) {
+func walkMatch(root, pattern string) ([]string, error) {
 	var matches []string
 	err := filepath.WalkDir(root, func(path string, info fs.DirEntry, err error) error {
-		die(err)
+		if err != nil {
+			return err
+		}
+
 		if info.IsDir() {
 			return nil
 		}
@@ -83,7 +81,9 @@ func WalkMatch(root, pattern string) ([]string, error) {
 		}
 		return nil
 	})
-	die(err)
+	if err != nil {
+		return nil, err
+	}
 	return matches, nil
 }
 
