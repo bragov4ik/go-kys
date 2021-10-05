@@ -16,15 +16,15 @@ type Info struct {
 }
 
 type Config struct {
-	CyclomaticWeights CycloCompWeights
+	CyclomaticWeights CycloCompWeights `xml:"cyclomatic"`
 }
 type CycloCompWeights struct {
-	IF   uint
-	FOR  uint
-	RNG  uint
-	CASE uint
-	AND  uint
-	OR   uint
+	IF   uint `xml:"if"`
+	FOR  uint `xml:"for"`
+	RNG  uint `xml:"rng"`
+	CASE uint `xml:"case"`
+	AND  uint `xml:"and"`
+	OR   uint `xml:"or"`
 }
 
 func parseNode(n ast.Node, info *Info, config *Config) {
