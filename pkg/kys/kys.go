@@ -15,10 +15,22 @@ type Info struct {
 	AssignStmt uint
 }
 
-func parseNode(n ast.Node, info *Info) {
+type Config struct {
+	cycloCompWeights CycloCompWeights
+}
+type CycloCompWeights struct {
+	IF   uint
+	FOR  uint
+	RNG  uint
+	CASE uint
+	AND  uint
+	OR   uint
+}
+
+func parseNode(n ast.Node, info *Info, config *Config) {
 	switch v := n.(type) {
 	case *ast.FuncDecl:
-		info.CycloComp += calcCycloComp(v)
+		info.CycloComp += calcCycloComp(v, config)
 	case *ast.FuncLit:
 		info.FuncLit++
 	case *ast.ReturnStmt:
@@ -46,9 +58,9 @@ func parseNode(n ast.Node, info *Info) {
 	}
 }
 
-func GetInfo(file *ast.File, info *Info) {
+func GetInfo(file *ast.File, info *Info, config *Config) {
 	ast.Inspect(file, func(n ast.Node) bool {
-		parseNode(n, info)
+		parseNode(n, info, config)
 		return true
 	})
 }
@@ -59,16 +71,26 @@ func (v branchVisitor) Visit(n ast.Node) (w ast.Visitor) {
 	return v(n)
 }
 
-func calcCycloComp(fd *ast.FuncDecl) uint {
+func calcCycloComp(fd *ast.FuncDecl, config *Config) uint {
 	var comp uint = 1
 	var v ast.Visitor
 	v = branchVisitor(func(n ast.Node) (w ast.Visitor) {
 		switch n := n.(type) {
-		case *ast.IfStmt, *ast.ForStmt, *ast.RangeStmt, *ast.CaseClause, *ast.CommClause:
-			comp++
+		case *ast.IfStmt:
+			comp += config.cycloCompWeights.IF
+		case *ast.ForStmt:
+			comp += config.cycloCompWeights.FOR
+		case *ast.RangeStmt:
+			comp += config.cycloCompWeights.RNG
+		case *ast.CaseClause:
+			comp += config.cycloCompWeights.CASE
+		case *ast.CommClause:
+			comp += config.cycloCompWeights.CASE
 		case *ast.BinaryExpr:
-			if n.Op == token.LAND || n.Op == token.LOR {
-				comp++
+			if n.Op == token.LAND {
+				comp += config.cycloCompWeights.AND
+			} else if n.Op == token.LOR {
+				comp += config.cycloCompWeights.OR
 			}
 		}
 		return v

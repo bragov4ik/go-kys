@@ -43,13 +43,14 @@ func main() {
 
 	fset := token.NewFileSet()
 	scores := kys.Info{}
+	config := kys.Config{}
 
 	for _, file := range files {
 		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
 		if err != nil {
 			log.Fatal(err)
 		}
-		kys.GetInfo(node, &scores)
+		kys.GetInfo(node, &scores, &config)
 	}
 
 	pp.Println(scores)
