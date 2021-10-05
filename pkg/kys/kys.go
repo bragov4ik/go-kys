@@ -8,7 +8,7 @@ import (
 )
 
 type Info struct {
-	FuncDecl   uint
+	CycloComp  uint
 	FuncLit    uint
 	ReturnStmt uint
 	CallExpr   uint
@@ -18,7 +18,7 @@ type Info struct {
 func parseNode(n ast.Node, info *Info) {
 	switch v := n.(type) {
 	case *ast.FuncDecl:
-		info.FuncDecl++
+		info.CycloComp += calcCycloComp(v)
 	case *ast.FuncLit:
 		info.FuncLit++
 	case *ast.ReturnStmt:
