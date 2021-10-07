@@ -7,23 +7,23 @@ import (
 	"math"
 )
 
-type HalsteadInfo struct {
+type Info struct {
 	operators map[string]uint
 	operands  map[string]uint
 }
 
-func NewHalsteadInfo() *HalsteadInfo {
-	return &HalsteadInfo{
+func NewInfo() *Info {
+	return &Info{
 		operators: make(map[string]uint),
 		operands:  make(map[string]uint),
 	}
 }
 
-func (info *HalsteadInfo) getN1Distinct() uint {
+func (info *Info) getN1Distinct() uint {
 	return uint(len(info.operators))
 }
 
-func (info *HalsteadInfo) getN2Distinct() uint {
+func (info *Info) getN2Distinct() uint {
 	return uint(len(info.operands))
 }
 
@@ -46,39 +46,39 @@ func tokenInArr(tok token.Token, arr []token.Token) bool {
 	return false
 }
 
-func (info *HalsteadInfo) getN1Total() uint {
+func (info *Info) getN1Total() uint {
 	sum := sumMap(info.operands)
 	return sum
 }
 
-func (info *HalsteadInfo) getN2Total() uint {
+func (info *Info) getN2Total() uint {
 	sum := sumMap(info.operators)
 	return sum
 }
 
-func (info *HalsteadInfo) Vocabuary() uint {
+func (info *Info) Vocabulary() uint {
 	n1Dist, n2Dist := info.getN1Distinct(), info.getN2Distinct()
 	return n1Dist + n2Dist
 }
 
-func (info *HalsteadInfo) Length() uint {
+func (info *Info) Length() uint {
 	n1Tot, n2Tot := info.getN1Total(), info.getN2Total()
 	return n1Tot + n2Tot
 }
 
-func (info *HalsteadInfo) Volume() float64 {
+func (info *Info) Volume() float64 {
 	nTot := info.Length()
-	nDist := info.Vocabuary()
+	nDist := info.Vocabulary()
 	return float64(nTot) * math.Log2(float64(nDist))
 }
 
-func (info *HalsteadInfo) Difficulty() float64 {
+func (info *Info) Difficulty() float64 {
 	n1Dist, n2Dist := info.getN1Distinct(), info.getN2Distinct()
 	n2Tot := info.getN2Total()
 	return (float64(n1Dist) * float64(n2Tot)) / (2 * float64(n2Dist))
 }
 
-func (info *HalsteadInfo) Effort() float64 {
+func (info *Info) Effort() float64 {
 	// Do not use other functions to avoid summing maps multiple times
 	n1Dist, n2Dist := float64(info.getN1Distinct()), float64(info.getN2Distinct())
 	n1Tot, n2Tot := float64(info.getN1Total()), float64(info.getN2Total())
@@ -87,19 +87,19 @@ func (info *HalsteadInfo) Effort() float64 {
 	return D * V
 }
 
-func (info *HalsteadInfo) addToken(nextToken token.Token) {
+func (info *Info) addToken(nextToken token.Token) {
 	tokenName := fmt.Sprintf("token:%s", nextToken.String())
 
 	NOT_OPERATORS := []token.Token{
-	    token.ILLEGAL,
-	    token.EOF,
-	    token.COMMENT,
-	    token.IDENT,
-	    token.INT,
-	    token.FLOAT,
-	    token.IMAG,
-	    token.CHAR,
-	    token.STRING,
+		token.ILLEGAL,
+		token.EOF,
+		token.COMMENT,
+		token.IDENT,
+		token.INT,
+		token.FLOAT,
+		token.IMAG,
+		token.CHAR,
+		token.STRING,
 	}
 
 	if !tokenInArr(nextToken, NOT_OPERATORS[:]) {
@@ -109,250 +109,250 @@ func (info *HalsteadInfo) addToken(nextToken token.Token) {
 
 // TODO count commas
 
-func (info *HalsteadInfo) AddArrayType(node *ast.ArrayType) {
+func (info *Info) AddArrayType(node *ast.ArrayType) {
 	// Nothing to count
 }
 
-func (info *HalsteadInfo) AddAssignStmt(node *ast.AssignStmt) {
+func (info *Info) AddAssignStmt(node *ast.AssignStmt) {
 	// lhs and rhs should be visited in walk (expr contains node)
 	info.addToken(node.Tok)
 }
 
-func (info *HalsteadInfo) AddBadDecl(node *ast.BadDecl) {
+func (info *Info) AddBadDecl(node *ast.BadDecl) {
 	// Nothing to count
 }
 
-func (info *HalsteadInfo) AddBadExpr(node *ast.BadExpr) {
+func (info *Info) AddBadExpr(node *ast.BadExpr) {
 	// Nothing to count
 }
 
-func (info *HalsteadInfo) AddBadStmt(node *ast.BadStmt) {
+func (info *Info) AddBadStmt(node *ast.BadStmt) {
 	// Nothing to count
 }
 
-func (info *HalsteadInfo) AddBasicLit(node *ast.BasicLit) {
+func (info *Info) AddBasicLit(node *ast.BasicLit) {
 	info.operands[node.Value] += 1
 }
 
-func (info *HalsteadInfo) AddBinaryExpr(node *ast.BinaryExpr) {
+func (info *Info) AddBinaryExpr(node *ast.BinaryExpr) {
 	// x and y should be visited in walk (expr contains node)
 	info.addToken(node.Op)
 }
 
-func (info *HalsteadInfo) AddBlockStmt(node *ast.BlockStmt) {
+func (info *Info) AddBlockStmt(node *ast.BlockStmt) {
 	// statements should be visited in walk
 	info.addToken(token.LBRACE)
 }
 
-func (info *HalsteadInfo) AddBranchStmt(node *ast.BranchStmt) {
+func (info *Info) AddBranchStmt(node *ast.BranchStmt) {
 	info.addToken(node.Tok)
 }
 
-func (info *HalsteadInfo) AddCallExpr(node *ast.CallExpr) {
+func (info *Info) AddCallExpr(node *ast.CallExpr) {
 	// leave expressions for further walk
 	// add only one of the parentheses as they are in pairs
 	info.addToken(token.LPAREN)
 	// Ellipsis are handled separately
 }
 
-func (info *HalsteadInfo) AddCaseClause(node *ast.CaseClause) {
+func (info *Info) AddCaseClause(node *ast.CaseClause) {
 	// no way to distinguish case and default, so just always assume case for now
 	info.addToken(token.CASE)
 	info.addToken(token.COLON)
 }
 
-func (info *HalsteadInfo) AddChanType(node *ast.ChanType) {
+func (info *Info) AddChanType(node *ast.ChanType) {
 	info.addToken(token.ARROW)
 	if node.Arrow != token.NoPos {
 		info.addToken(token.CHAN)
 	}
 }
 
-func (info *HalsteadInfo) AddCommClause(node *ast.CommClause) {
+func (info *Info) AddCommClause(node *ast.CommClause) {
 	// no way to distinguish case and default, so just always assume case for now
 	info.addToken(token.CASE)
 	info.addToken(token.COLON)
 }
 
-func (info *HalsteadInfo) AddComment(node *ast.Comment) {
+func (info *Info) AddComment(node *ast.Comment) {
 	// Nothing to count
 }
 
-func (info *HalsteadInfo) AddCommentGroup(node *ast.CommentGroup) {
+func (info *Info) AddCommentGroup(node *ast.CommentGroup) {
 	// Nothing to count
 }
 
-func (info *HalsteadInfo) AddCompositeLit(node *ast.CompositeLit) {
+func (info *Info) AddCompositeLit(node *ast.CompositeLit) {
 	// Maybe also consider `Elts` (e.g. if it always results in commas added)
 	info.addToken(token.LPAREN)
 }
 
-func (info *HalsteadInfo) AddDeclStmt(node *ast.DeclStmt) {
+func (info *Info) AddDeclStmt(node *ast.DeclStmt) {
 	// GenDecl is handled separately
 }
 
-func (info *HalsteadInfo) AddDeferStmt(node *ast.DeferStmt) {
+func (info *Info) AddDeferStmt(node *ast.DeferStmt) {
 	info.addToken(token.DEFER)
 }
 
-func (info *HalsteadInfo) AddEllipsis(node *ast.Ellipsis) {
+func (info *Info) AddEllipsis(node *ast.Ellipsis) {
 	info.addToken(token.ELLIPSIS)
 }
 
-func (info *HalsteadInfo) AddEmptyStmt(node *ast.EmptyStmt) {
+func (info *Info) AddEmptyStmt(node *ast.EmptyStmt) {
 	if !node.Implicit {
 		info.addToken(token.SEMICOLON)
 	}
 }
 
-func (info *HalsteadInfo) AddExprStmt(node *ast.ExprStmt) {
+func (info *Info) AddExprStmt(node *ast.ExprStmt) {
 	// Nothing to count
 }
 
-func (info *HalsteadInfo) AddField(node *ast.Field) {
+func (info *Info) AddField(node *ast.Field) {
 	// Nothing to count
 }
 
-func (info *HalsteadInfo) AddFieldList(node *ast.FieldList) {
+func (info *Info) AddFieldList(node *ast.FieldList) {
 	if node.Opening.IsValid() {
 		info.addToken(token.LPAREN)
 	}
 }
 
-func (info *HalsteadInfo) AddFile(node *ast.File) {
+func (info *Info) AddFile(node *ast.File) {
 	info.addToken(token.PACKAGE)
 }
 
-func (info *HalsteadInfo) AddForStmt(node *ast.ForStmt) {
+func (info *Info) AddForStmt(node *ast.ForStmt) {
 	info.addToken(token.FOR)
 }
 
-func (info *HalsteadInfo) AddFuncDecl(node *ast.FuncDecl) {
+func (info *Info) AddFuncDecl(node *ast.FuncDecl) {
 	// Composite type only, nothing
 }
 
-func (info *HalsteadInfo) AddFuncLit(node *ast.FuncLit) {
+func (info *Info) AddFuncLit(node *ast.FuncLit) {
 	// Composite type only, nothing
 }
 
-func (info *HalsteadInfo) AddFuncType(node *ast.FuncType) {
+func (info *Info) AddFuncType(node *ast.FuncType) {
 	info.addToken(token.FUNC)
 }
 
-func (info *HalsteadInfo) AddGenDecl(node *ast.GenDecl) {
+func (info *Info) AddGenDecl(node *ast.GenDecl) {
 	info.addToken(node.Tok)
 	if node.Lparen.IsValid() {
 		info.addToken(token.LPAREN)
 	}
 }
 
-func (info *HalsteadInfo) AddGoStmt(node *ast.GoStmt) {
+func (info *Info) AddGoStmt(node *ast.GoStmt) {
 	info.addToken(token.GO)
 }
 
-func (info *HalsteadInfo) AddIdent(node *ast.Ident) {
+func (info *Info) AddIdent(node *ast.Ident) {
 	info.operands[node.Name] += 1
 }
 
-func (info *HalsteadInfo) AddIfStmt(node *ast.IfStmt) {
+func (info *Info) AddIfStmt(node *ast.IfStmt) {
 	info.addToken(token.IF)
 }
 
-func (info *HalsteadInfo) AddImportSpec(node *ast.ImportSpec) {
+func (info *Info) AddImportSpec(node *ast.ImportSpec) {
 	// Composite type only, nothing
 }
 
-func (info *HalsteadInfo) AddIncDecStmt(node *ast.IncDecStmt) {
+func (info *Info) AddIncDecStmt(node *ast.IncDecStmt) {
 	info.addToken(node.Tok)
 }
 
-func (info *HalsteadInfo) AddIndexExpr(node *ast.IndexExpr) {
+func (info *Info) AddIndexExpr(node *ast.IndexExpr) {
 	if node.Lbrack.IsValid() {
 		info.addToken(token.LBRACK)
 	}
 }
 
-func (info *HalsteadInfo) AddInterfaceType(node *ast.InterfaceType) {
+func (info *Info) AddInterfaceType(node *ast.InterfaceType) {
 	info.addToken(token.INTERFACE)
 }
 
-func (info *HalsteadInfo) AddKeyValueExpr(node *ast.KeyValueExpr) {
+func (info *Info) AddKeyValueExpr(node *ast.KeyValueExpr) {
 	info.addToken(token.COLON)
 }
 
-func (info *HalsteadInfo) AddLabeledStmt(node *ast.LabeledStmt) {
+func (info *Info) AddLabeledStmt(node *ast.LabeledStmt) {
 	info.addToken(token.COLON)
 }
 
-func (info *HalsteadInfo) AddMapType(node *ast.MapType) {
+func (info *Info) AddMapType(node *ast.MapType) {
 	info.addToken(token.MAP)
 }
 
-func (info *HalsteadInfo) AddPackage(node *ast.Package) {
+func (info *Info) AddPackage(node *ast.Package) {
 	// name should be handled by ident, so ignore is as apparently it is
 	// not a particular part of code but rather abstract entity (set of files?).
 }
 
-func (info *HalsteadInfo) AddParenExpr(node *ast.ParenExpr) {
+func (info *Info) AddParenExpr(node *ast.ParenExpr) {
 	info.addToken(token.LPAREN)
 }
 
-func (info *HalsteadInfo) AddRangeStmt(node *ast.RangeStmt) {
+func (info *Info) AddRangeStmt(node *ast.RangeStmt) {
 	// for should be already handled by `AddForStmt`
 	info.addToken(node.Tok)
 	info.addToken(token.RANGE)
 }
 
-func (info *HalsteadInfo) AddReturnStmt(node *ast.ReturnStmt) {
+func (info *Info) AddReturnStmt(node *ast.ReturnStmt) {
 	info.addToken(token.RETURN)
 }
 
-func (info *HalsteadInfo) AddSelectStmt(node *ast.SelectStmt) {
+func (info *Info) AddSelectStmt(node *ast.SelectStmt) {
 	info.addToken(token.SELECT)
 }
 
-func (info *HalsteadInfo) AddSelectorExpr(node *ast.SelectorExpr) {
+func (info *Info) AddSelectorExpr(node *ast.SelectorExpr) {
 	info.addToken(token.PERIOD)
 }
 
-func (info *HalsteadInfo) AddSendStmt(node *ast.SendStmt) {
+func (info *Info) AddSendStmt(node *ast.SendStmt) {
 	info.addToken(token.ARROW)
 }
 
-func (info *HalsteadInfo) AddSliceExpr(node *ast.SliceExpr) {
+func (info *Info) AddSliceExpr(node *ast.SliceExpr) {
 	info.addToken(token.LBRACK)
 }
 
-func (info *HalsteadInfo) AddStarExpr(node *ast.StarExpr) {
+func (info *Info) AddStarExpr(node *ast.StarExpr) {
 	info.addToken(token.MUL)
 }
 
-func (info *HalsteadInfo) AddStructType(node *ast.StructType) {
+func (info *Info) AddStructType(node *ast.StructType) {
 	info.addToken(token.STRUCT)
 }
 
-func (info *HalsteadInfo) AddSwitchStmt(node *ast.SwitchStmt) {
+func (info *Info) AddSwitchStmt(node *ast.SwitchStmt) {
 	info.addToken(token.SWITCH)
 }
 
-func (info *HalsteadInfo) AddTypeAssertExpr(node *ast.TypeAssertExpr) {
+func (info *Info) AddTypeAssertExpr(node *ast.TypeAssertExpr) {
 	info.addToken(token.LPAREN)
 }
 
-func (info *HalsteadInfo) AddTypeSpec(node *ast.TypeSpec) {
+func (info *Info) AddTypeSpec(node *ast.TypeSpec) {
 	if node.Assign.IsValid() {
 		info.addToken(token.ASSIGN)
 	}
 }
 
-func (info *HalsteadInfo) AddTypeSwitchStmt(node *ast.TypeSwitchStmt) {
+func (info *Info) AddTypeSwitchStmt(node *ast.TypeSwitchStmt) {
 	info.addToken(token.SWITCH)
 }
 
-func (info *HalsteadInfo) AddUnaryExpr(node *ast.UnaryExpr) {
+func (info *Info) AddUnaryExpr(node *ast.UnaryExpr) {
 	info.addToken(node.Op)
 }
 
-func (info *HalsteadInfo) AddValueSpec(node *ast.ValueSpec) {
+func (info *Info) AddValueSpec(node *ast.ValueSpec) {
 	// Something composite only, ignore
 }

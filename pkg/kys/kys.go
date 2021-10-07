@@ -17,11 +17,11 @@ type Info struct {
 	CallExpr   uint
 	AssignStmt uint
 	Comments   uint
-	Halstead   halstead.HalsteadInfo
+	Halstead   halstead.Info
 }
 
 func NewInfo() *Info {
-	return &Info{Halstead: *halstead.NewHalsteadInfo()}
+	return &Info{Halstead: *halstead.NewInfo()}
 }
 
 type Config struct {
@@ -148,7 +148,7 @@ func parseNode(n ast.Node, info *Info, cfg *Config) {
 		info.Halstead.AddUnaryExpr(v)
 	case *ast.ValueSpec:
 		info.Halstead.AddValueSpec(v)
-	
+
 	default:
 		if n != nil {
 			fmt.Printf("Unhandled type: %T ", v)
