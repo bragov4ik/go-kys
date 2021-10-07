@@ -14,6 +14,13 @@ type Metric struct {
 	operands  map[string]uint
 }
 
+func NewMetric() Metric {
+	return Metric{
+		operators: make(map[string]uint),
+		operands:  make(map[string]uint),
+	}
+}
+
 func (m *Metric) ParseNode(n ast.Node) {
 	switch v := n.(type) {
 	case *ast.ArrayType:
@@ -135,23 +142,18 @@ func (m *Metric) ParseNode(n ast.Node) {
 }
 
 func (m Metric) Finish() float64 {
-	n1 := float64(m.GetN1Distinct())
-	n2 := float64(m.GetN2Distinct())
-	return n1*math.Log2(n1) + n2*math.Log2(n2)
+	n1 := float64(m.getN1Distinct())
+	n2 := float64(m.getN2Distinct())
+	N1 := float64(m.getN1Total())
+	N2 := float64(m.getN2Total())
+	return (N1 + N2) * math.Log2(n1+n2)
 }
 
-func NewMetric() Metric {
-	return Metric{
-		operators: make(map[string]uint),
-		operands:  make(map[string]uint),
-	}
-}
-
-func (m *Metric) GetN1Distinct() uint {
+func (m *Metric) getN1Distinct() uint {
 	return uint(len(m.operators))
 }
 
-func (m *Metric) GetN2Distinct() uint {
+func (m *Metric) getN2Distinct() uint {
 	return uint(len(m.operands))
 }
 
@@ -174,41 +176,12 @@ func tokenInArr(tok token.Token, arr []token.Token) bool {
 	return false
 }
 
-func (m *Metric) GetN1Total() uint {
+func (m *Metric) getN1Total() uint {
 	return sumMap(m.operands)
 }
 
-func (m *Metric) GetN2Total() uint {
+func (m *Metric) getN2Total() uint {
 	return sumMap(m.operators)
-}
-
-func (m *Metric) Vocabulary() uint {
-	return m.GetN1Distinct() + m.GetN2Distinct()
-}
-
-func (m *Metric) Length() uint {
-	return m.GetN1Total() + m.GetN2Total()
-}
-
-func (m *Metric) Volume() float64 {
-	nTot := m.Length()
-	nDist := m.Vocabulary()
-	return float64(nTot) * math.Log2(float64(nDist))
-}
-
-func (m *Metric) Difficulty() float64 {
-	n1Dist, n2Dist := m.GetN1Distinct(), m.GetN2Distinct()
-	n2Tot := m.GetN2Total()
-	return (float64(n1Dist) * float64(n2Tot)) / (2 * float64(n2Dist))
-}
-
-func (m *Metric) Effort() float64 {
-	// Do not use other functions to avoid summing maps multiple times
-	n1Dist, n2Dist := float64(m.GetN1Distinct()), float64(m.GetN2Distinct())
-	n1Tot, n2Tot := float64(m.GetN1Total()), float64(m.GetN2Total())
-	D := (n1Dist * n2Tot) / (2 * n2Dist)
-	V := (n1Tot + n2Tot) * math.Log2(n1Dist+n2Dist)
-	return D * V
 }
 
 func (m *Metric) addToken(nextToken token.Token) {

@@ -19,7 +19,7 @@ func TestLoremIpsum(t *testing.T) {
 	weight := uint(2)
 	want := nwords * weight
 
-	got := GetCommentComp(&comment, &Weights{weight})
+	got := getCommentComp(&comment, &Weights{weight})
 	if got != want {
 		t.Fatalf(`GetCommentComp("Lorem ipsum...") = %v, Wanted %v`, got, want)
 	}

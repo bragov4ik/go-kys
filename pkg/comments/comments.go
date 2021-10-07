@@ -17,7 +17,7 @@ type Metric struct {
 func (m *Metric) ParseNode(n ast.Node) {
 	v, ok := n.(*ast.Comment)
 	if ok {
-		m.Score += GetCommentComp(v, &m.Config)
+		m.Score += getCommentComp(v, &m.Config)
 	}
 }
 
@@ -25,6 +25,6 @@ func (m Metric) Finish() float64 {
 	return float64(m.Score)
 }
 
-func GetCommentComp(comment *ast.Comment, config *Weights) uint {
+func getCommentComp(comment *ast.Comment, config *Weights) uint {
 	return uint(len(strings.Fields(comment.Text))) * config.Word
 }
