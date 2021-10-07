@@ -12,8 +12,8 @@ type Info struct {
 	operands  map[string]uint
 }
 
-func NewInfo() *Info {
-	return &Info{
+func NewInfo() Info {
+	return Info{
 		operators: make(map[string]uint),
 		operands:  make(map[string]uint),
 	}

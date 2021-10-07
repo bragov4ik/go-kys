@@ -20,8 +20,8 @@ type Info struct {
 	Halstead   halstead.Info
 }
 
-func NewInfo() *Info {
-	return &Info{Halstead: *halstead.NewInfo()}
+func NewInfo() Info {
+	return Info{Halstead: halstead.NewInfo()}
 }
 
 type Config struct {

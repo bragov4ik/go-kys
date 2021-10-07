@@ -53,7 +53,7 @@ func main() {
 	files := getFiles(flag.Args())
 
 	fset := token.NewFileSet()
-	scores := *kys.NewInfo()
+	scores := kys.NewInfo()
 
 	for _, file := range files {
 		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
