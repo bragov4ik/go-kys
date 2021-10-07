@@ -13,7 +13,7 @@ import (
 	"go/token"
 
 	"github.com/bragov4ik/go-kys/pkg/kys"
-	"github.com/k0kubun/pp"
+	"github.com/k0kubun/pp/v3"
 )
 
 var cfgpath = flag.String("c", "config.xml", "XML config")
@@ -53,7 +53,7 @@ func main() {
 	files := getFiles(flag.Args())
 
 	fset := token.NewFileSet()
-	scores := kys.Info{}
+	scores := kys.NewInfo()
 
 	for _, file := range files {
 		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
