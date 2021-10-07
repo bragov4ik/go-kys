@@ -47,13 +47,11 @@ func tokenInArr(tok token.Token, arr []token.Token) bool {
 }
 
 func (info *Info) getN1Total() uint {
-	sum := sumMap(info.operands)
-	return sum
+	return sumMap(info.operands)
 }
 
 func (info *Info) getN2Total() uint {
-	sum := sumMap(info.operators)
-	return sum
+	return sumMap(info.operators)
 }
 
 func (info *Info) Vocabulary() uint {
