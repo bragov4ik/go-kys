@@ -19,10 +19,6 @@ func NewHalsteadInfo() *HalsteadInfo {
 	}
 }
 
-func (info *HalsteadInfo) String() string {
-	return fmt.Sprintf("%v, %v", info.operators, info.operands)
-}
-
 func (info *HalsteadInfo) getN1Distinct() uint {
 	return uint(len(info.operators))
 }
