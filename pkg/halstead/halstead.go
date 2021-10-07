@@ -90,7 +90,17 @@ func (info *HalsteadInfo) Effort() float64 {
 func (info *HalsteadInfo) addToken(nextToken token.Token) {
 	tokenName := fmt.Sprintf("token:%s", nextToken.String())
 
-	NOT_OPERATORS := []token.Token{token.ILLEGAL, token.EOF, token.COMMENT, token.IDENT, token.INT, token.FLOAT, token.IMAG, token.CHAR, token.STRING}
+	NOT_OPERATORS := []token.Token{
+	    token.ILLEGAL,
+	    token.EOF,
+	    token.COMMENT,
+	    token.IDENT,
+	    token.INT,
+	    token.FLOAT,
+	    token.IMAG,
+	    token.CHAR,
+	    token.STRING,
+	}
 
 	if !tokenInArr(nextToken, NOT_OPERATORS[:]) {
 		info.operators[tokenName] += 1
