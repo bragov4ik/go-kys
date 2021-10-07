@@ -55,13 +55,11 @@ func (info *Info) getN2Total() uint {
 }
 
 func (info *Info) Vocabulary() uint {
-	n1Dist, n2Dist := info.getN1Distinct(), info.getN2Distinct()
-	return n1Dist + n2Dist
+	return info.getN1Distinct() + info.getN2Distinct()
 }
 
 func (info *Info) Length() uint {
-	n1Tot, n2Tot := info.getN1Total(), info.getN2Total()
-	return n1Tot + n2Tot
+	return info.getN1Total() + info.getN2Total()
 }
 
 func (info *Info) Volume() float64 {
