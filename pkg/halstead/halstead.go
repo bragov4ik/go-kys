@@ -15,7 +15,7 @@ type HalsteadInfo struct {
 func NewHalsteadInfo() *HalsteadInfo {
 	return &HalsteadInfo{
 		operators: make(map[string]uint),
-		operands: make(map[string]uint),
+		operands:  make(map[string]uint),
 	}
 }
 
@@ -91,7 +91,7 @@ func (info *HalsteadInfo) addToken(nextToken token.Token) {
 	tokenName := fmt.Sprintf("token:%s", nextToken.String())
 
 	NOT_OPERATORS := []token.Token{token.ILLEGAL, token.EOF, token.COMMENT, token.IDENT, token.INT, token.FLOAT, token.IMAG, token.CHAR, token.STRING}
-	
+
 	if !tokenInArr(nextToken, NOT_OPERATORS[:]) {
 		info.operators[tokenName] += 1
 	}
@@ -101,7 +101,6 @@ func (info *HalsteadInfo) addToken(nextToken token.Token) {
 
 func (info *HalsteadInfo) AddArrayType(node *ast.ArrayType) {
 	// Nothing to count
-	return
 }
 
 func (info *HalsteadInfo) AddAssignStmt(node *ast.AssignStmt) {
@@ -111,17 +110,14 @@ func (info *HalsteadInfo) AddAssignStmt(node *ast.AssignStmt) {
 
 func (info *HalsteadInfo) AddBadDecl(node *ast.BadDecl) {
 	// Nothing to count
-	return
 }
 
 func (info *HalsteadInfo) AddBadExpr(node *ast.BadExpr) {
 	// Nothing to count
-	return
 }
 
 func (info *HalsteadInfo) AddBadStmt(node *ast.BadStmt) {
 	// Nothing to count
-	return
 }
 
 func (info *HalsteadInfo) AddBasicLit(node *ast.BasicLit) {
@@ -170,12 +166,10 @@ func (info *HalsteadInfo) AddCommClause(node *ast.CommClause) {
 
 func (info *HalsteadInfo) AddComment(node *ast.Comment) {
 	// Nothing to count
-	return
 }
 
 func (info *HalsteadInfo) AddCommentGroup(node *ast.CommentGroup) {
 	// Nothing to count
-	return
 }
 
 func (info *HalsteadInfo) AddCompositeLit(node *ast.CompositeLit) {
@@ -185,7 +179,6 @@ func (info *HalsteadInfo) AddCompositeLit(node *ast.CompositeLit) {
 
 func (info *HalsteadInfo) AddDeclStmt(node *ast.DeclStmt) {
 	// GenDecl is handled separately
-	return
 }
 
 func (info *HalsteadInfo) AddDeferStmt(node *ast.DeferStmt) {
@@ -197,19 +190,17 @@ func (info *HalsteadInfo) AddEllipsis(node *ast.Ellipsis) {
 }
 
 func (info *HalsteadInfo) AddEmptyStmt(node *ast.EmptyStmt) {
-	if !node.Implicit{
+	if !node.Implicit {
 		info.addToken(token.SEMICOLON)
 	}
 }
 
 func (info *HalsteadInfo) AddExprStmt(node *ast.ExprStmt) {
 	// Nothing to count
-	return
 }
 
 func (info *HalsteadInfo) AddField(node *ast.Field) {
 	// Nothing to count
-	return
 }
 
 func (info *HalsteadInfo) AddFieldList(node *ast.FieldList) {
@@ -228,12 +219,10 @@ func (info *HalsteadInfo) AddForStmt(node *ast.ForStmt) {
 
 func (info *HalsteadInfo) AddFuncDecl(node *ast.FuncDecl) {
 	// Composite type only, nothing
-	return
 }
 
 func (info *HalsteadInfo) AddFuncLit(node *ast.FuncLit) {
 	// Composite type only, nothing
-	return
 }
 
 func (info *HalsteadInfo) AddFuncType(node *ast.FuncType) {
@@ -261,7 +250,6 @@ func (info *HalsteadInfo) AddIfStmt(node *ast.IfStmt) {
 
 func (info *HalsteadInfo) AddImportSpec(node *ast.ImportSpec) {
 	// Composite type only, nothing
-	return
 }
 
 func (info *HalsteadInfo) AddIncDecStmt(node *ast.IncDecStmt) {
@@ -291,9 +279,8 @@ func (info *HalsteadInfo) AddMapType(node *ast.MapType) {
 }
 
 func (info *HalsteadInfo) AddPackage(node *ast.Package) {
-	// name should be handled by ident, so ignore is as apparently it is 
+	// name should be handled by ident, so ignore is as apparently it is
 	// not a particular part of code but rather abstract entity (set of files?).
-	return
 }
 
 func (info *HalsteadInfo) AddParenExpr(node *ast.ParenExpr) {
@@ -316,7 +303,6 @@ func (info *HalsteadInfo) AddSelectStmt(node *ast.SelectStmt) {
 
 func (info *HalsteadInfo) AddSelectorExpr(node *ast.SelectorExpr) {
 	info.addToken(token.PERIOD)
-	return
 }
 
 func (info *HalsteadInfo) AddSendStmt(node *ast.SendStmt) {
@@ -359,5 +345,4 @@ func (info *HalsteadInfo) AddUnaryExpr(node *ast.UnaryExpr) {
 
 func (info *HalsteadInfo) AddValueSpec(node *ast.ValueSpec) {
 	// Something composite only, ignore
-	return
 }
