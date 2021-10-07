@@ -12,20 +12,20 @@ import (
 	"go/parser"
 	"go/token"
 
-	"github.com/bragov4ik/go-kys/pkg/kys"
+	"github.com/bragov4ik/go-kys/pkg/wmfp"
 	"github.com/k0kubun/pp/v3"
 )
 
 var cfgpath = flag.String("c", "config.xml", "XML config")
 
-func readCfg() kys.Config {
+func readCfg() wmfp.Config {
 	file, err := os.Open(*cfgpath)
 	die(err)
 	defer func(cfg *os.File) { die(cfg.Close()) }(file)
 	bytes, err := ioutil.ReadAll(file)
 	die(err)
 
-	var cfg kys.Config
+	var cfg wmfp.Config
 	die(xml.Unmarshal(bytes, &cfg))
 	return cfg
 }
@@ -53,15 +53,16 @@ func main() {
 	files := getFiles(flag.Args())
 
 	fset := token.NewFileSet()
-	scores := kys.NewInfo()
+	measurer := wmfp.NewMeasurerWMFP()
+	measurer.Configure(&cfg)
 
 	for _, file := range files {
 		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
 		die(err)
-		kys.GetInfo(node, &scores, &cfg)
+		measurer.ParseFile(node)
 	}
 
-	pp.Println(scores)
+	pp.Println(measurer.Finish())
 }
 
 func walkMatch(root, pattern string) ([]string, error) {

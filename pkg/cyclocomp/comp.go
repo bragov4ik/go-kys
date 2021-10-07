@@ -20,6 +20,22 @@ func (v branchVisitor) Visit(n ast.Node) (w ast.Visitor) {
 	return v(n)
 }
 
+type Metric struct {
+	Config Weights
+	Comp   uint
+}
+
+func (m *Metric) ParseNode(n ast.Node) {
+	v, ok := n.(*ast.FuncDecl)
+	if ok {
+		m.Comp += GetCycloComp(v, &m.Config)
+	}
+}
+
+func (m Metric) Finish() float64 {
+	return float64(m.Comp)
+}
+
 func GetCycloComp(fd *ast.FuncDecl, config *Weights) uint {
 	var comp uint = 1
 	var v ast.Visitor

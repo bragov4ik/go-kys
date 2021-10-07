@@ -5,26 +5,154 @@ import (
 	"go/ast"
 	"go/token"
 	"math"
+
+	"github.com/k0kubun/pp/v3"
 )
 
-type Info struct {
+type Metric struct {
 	operators map[string]uint
 	operands  map[string]uint
 }
 
-func NewInfo() Info {
-	return Info{
+func (m *Metric) ParseNode(n ast.Node) {
+	switch v := n.(type) {
+	case *ast.ArrayType:
+		m.addArrayType(v)
+	case *ast.AssignStmt:
+		m.addAssignStmt(v)
+	case *ast.BadDecl:
+		m.addBadDecl(v)
+	case *ast.BadExpr:
+		m.addBadExpr(v)
+	case *ast.BadStmt:
+		m.addBadStmt(v)
+	case *ast.BasicLit:
+		m.addBasicLit(v)
+	case *ast.BinaryExpr:
+		m.addBinaryExpr(v)
+	case *ast.BlockStmt:
+		m.addBlockStmt(v)
+	case *ast.BranchStmt:
+		m.addBranchStmt(v)
+	case *ast.CallExpr:
+		m.addCallExpr(v)
+	case *ast.CaseClause:
+		m.addCaseClause(v)
+	case *ast.ChanType:
+		m.addChanType(v)
+	case *ast.CommClause:
+		m.addCommClause(v)
+	case *ast.Comment:
+		m.addComment(v)
+	case *ast.CommentGroup:
+		m.addCommentGroup(v)
+	case *ast.CompositeLit:
+		m.addCompositeLit(v)
+	case *ast.DeclStmt:
+		m.addDeclStmt(v)
+	case *ast.DeferStmt:
+		m.addDeferStmt(v)
+	case *ast.Ellipsis:
+		m.addEllipsis(v)
+	case *ast.EmptyStmt:
+		m.addEmptyStmt(v)
+	case *ast.ExprStmt:
+		m.addExprStmt(v)
+	case *ast.Field:
+		m.addField(v)
+	case *ast.FieldList:
+		m.addFieldList(v)
+	case *ast.File:
+		m.addFile(v)
+	case *ast.ForStmt:
+		m.addForStmt(v)
+	case *ast.FuncDecl:
+		m.addFuncDecl(v)
+	case *ast.FuncLit:
+		m.addFuncLit(v)
+	case *ast.FuncType:
+		m.addFuncType(v)
+	case *ast.GenDecl:
+		m.addGenDecl(v)
+	case *ast.GoStmt:
+		m.addGoStmt(v)
+	case *ast.Ident:
+		m.addIdent(v)
+	case *ast.IfStmt:
+		m.addIfStmt(v)
+	case *ast.ImportSpec:
+		m.addImportSpec(v)
+	case *ast.IncDecStmt:
+		m.addIncDecStmt(v)
+	case *ast.IndexExpr:
+		m.addIndexExpr(v)
+	case *ast.InterfaceType:
+		m.addInterfaceType(v)
+	case *ast.KeyValueExpr:
+		m.addKeyValueExpr(v)
+	case *ast.LabeledStmt:
+		m.addLabeledStmt(v)
+	case *ast.MapType:
+		m.addMapType(v)
+	case *ast.Package:
+		m.addPackage(v)
+	case *ast.ParenExpr:
+		m.addParenExpr(v)
+	case *ast.RangeStmt:
+		m.addRangeStmt(v)
+	case *ast.ReturnStmt:
+		m.addReturnStmt(v)
+	case *ast.SelectStmt:
+		m.addSelectStmt(v)
+	case *ast.SelectorExpr:
+		m.addSelectorExpr(v)
+	case *ast.SendStmt:
+		m.addSendStmt(v)
+	case *ast.SliceExpr:
+		m.addSliceExpr(v)
+	case *ast.StarExpr:
+		m.addStarExpr(v)
+	case *ast.StructType:
+		m.addStructType(v)
+	case *ast.SwitchStmt:
+		m.addSwitchStmt(v)
+	case *ast.TypeAssertExpr:
+		m.addTypeAssertExpr(v)
+	case *ast.TypeSpec:
+		m.addTypeSpec(v)
+	case *ast.TypeSwitchStmt:
+		m.addTypeSwitchStmt(v)
+	case *ast.UnaryExpr:
+		m.addUnaryExpr(v)
+	case *ast.ValueSpec:
+		m.addValueSpec(v)
+	default:
+		if n != nil {
+			fmt.Printf("Unhandled type: %T ", v)
+			pp.Printf("%v\n", n)
+		}
+	}
+}
+
+func (m Metric) Finish() float64 {
+	n1 := float64(m.GetN1Distinct())
+	n2 := float64(m.GetN2Distinct())
+	return n1*math.Log2(n1) + n2*math.Log2(n2)
+}
+
+func NewMetric() Metric {
+	return Metric{
 		operators: make(map[string]uint),
 		operands:  make(map[string]uint),
 	}
 }
 
-func (info *Info) getN1Distinct() uint {
-	return uint(len(info.operators))
+func (m *Metric) GetN1Distinct() uint {
+	return uint(len(m.operators))
 }
 
-func (info *Info) getN2Distinct() uint {
-	return uint(len(info.operands))
+func (m *Metric) GetN2Distinct() uint {
+	return uint(len(m.operands))
 }
 
 // Not universal key type because using interfaces is nasty
@@ -46,44 +174,44 @@ func tokenInArr(tok token.Token, arr []token.Token) bool {
 	return false
 }
 
-func (info *Info) getN1Total() uint {
-	return sumMap(info.operands)
+func (m *Metric) GetN1Total() uint {
+	return sumMap(m.operands)
 }
 
-func (info *Info) getN2Total() uint {
-	return sumMap(info.operators)
+func (m *Metric) GetN2Total() uint {
+	return sumMap(m.operators)
 }
 
-func (info *Info) Vocabulary() uint {
-	return info.getN1Distinct() + info.getN2Distinct()
+func (m *Metric) Vocabulary() uint {
+	return m.GetN1Distinct() + m.GetN2Distinct()
 }
 
-func (info *Info) Length() uint {
-	return info.getN1Total() + info.getN2Total()
+func (m *Metric) Length() uint {
+	return m.GetN1Total() + m.GetN2Total()
 }
 
-func (info *Info) Volume() float64 {
-	nTot := info.Length()
-	nDist := info.Vocabulary()
+func (m *Metric) Volume() float64 {
+	nTot := m.Length()
+	nDist := m.Vocabulary()
 	return float64(nTot) * math.Log2(float64(nDist))
 }
 
-func (info *Info) Difficulty() float64 {
-	n1Dist, n2Dist := info.getN1Distinct(), info.getN2Distinct()
-	n2Tot := info.getN2Total()
+func (m *Metric) Difficulty() float64 {
+	n1Dist, n2Dist := m.GetN1Distinct(), m.GetN2Distinct()
+	n2Tot := m.GetN2Total()
 	return (float64(n1Dist) * float64(n2Tot)) / (2 * float64(n2Dist))
 }
 
-func (info *Info) Effort() float64 {
+func (m *Metric) Effort() float64 {
 	// Do not use other functions to avoid summing maps multiple times
-	n1Dist, n2Dist := float64(info.getN1Distinct()), float64(info.getN2Distinct())
-	n1Tot, n2Tot := float64(info.getN1Total()), float64(info.getN2Total())
+	n1Dist, n2Dist := float64(m.GetN1Distinct()), float64(m.GetN2Distinct())
+	n1Tot, n2Tot := float64(m.GetN1Total()), float64(m.GetN2Total())
 	D := (n1Dist * n2Tot) / (2 * n2Dist)
 	V := (n1Tot + n2Tot) * math.Log2(n1Dist+n2Dist)
 	return D * V
 }
 
-func (info *Info) addToken(nextToken token.Token) {
+func (m *Metric) addToken(nextToken token.Token) {
 	tokenName := fmt.Sprintf("token:%s", nextToken.String())
 
 	NOT_OPERATORS := []token.Token{
@@ -99,256 +227,256 @@ func (info *Info) addToken(nextToken token.Token) {
 	}
 
 	if !tokenInArr(nextToken, NOT_OPERATORS[:]) {
-		info.operators[tokenName] += 1
+		m.operators[tokenName] += 1
 	}
 }
 
 // TODO count commas
 
-func (info *Info) AddArrayType(node *ast.ArrayType) {
+func (m *Metric) addArrayType(node *ast.ArrayType) {
 	// Nothing to count
 }
 
-func (info *Info) AddAssignStmt(node *ast.AssignStmt) {
+func (m *Metric) addAssignStmt(node *ast.AssignStmt) {
 	// lhs and rhs should be visited in walk (expr contains node)
-	info.addToken(node.Tok)
+	m.addToken(node.Tok)
 }
 
-func (info *Info) AddBadDecl(node *ast.BadDecl) {
+func (m *Metric) addBadDecl(node *ast.BadDecl) {
 	// Nothing to count
 }
 
-func (info *Info) AddBadExpr(node *ast.BadExpr) {
+func (m *Metric) addBadExpr(node *ast.BadExpr) {
 	// Nothing to count
 }
 
-func (info *Info) AddBadStmt(node *ast.BadStmt) {
+func (m *Metric) addBadStmt(node *ast.BadStmt) {
 	// Nothing to count
 }
 
-func (info *Info) AddBasicLit(node *ast.BasicLit) {
-	info.operands[node.Value] += 1
+func (m *Metric) addBasicLit(node *ast.BasicLit) {
+	m.operands[node.Value] += 1
 }
 
-func (info *Info) AddBinaryExpr(node *ast.BinaryExpr) {
+func (m *Metric) addBinaryExpr(node *ast.BinaryExpr) {
 	// x and y should be visited in walk (expr contains node)
-	info.addToken(node.Op)
+	m.addToken(node.Op)
 }
 
-func (info *Info) AddBlockStmt(node *ast.BlockStmt) {
+func (m *Metric) addBlockStmt(node *ast.BlockStmt) {
 	// statements should be visited in walk
-	info.addToken(token.LBRACE)
+	m.addToken(token.LBRACE)
 }
 
-func (info *Info) AddBranchStmt(node *ast.BranchStmt) {
-	info.addToken(node.Tok)
+func (m *Metric) addBranchStmt(node *ast.BranchStmt) {
+	m.addToken(node.Tok)
 }
 
-func (info *Info) AddCallExpr(node *ast.CallExpr) {
+func (m *Metric) addCallExpr(node *ast.CallExpr) {
 	// leave expressions for further walk
 	// add only one of the parentheses as they are in pairs
-	info.addToken(token.LPAREN)
+	m.addToken(token.LPAREN)
 	// Ellipsis are handled separately
 }
 
-func (info *Info) AddCaseClause(node *ast.CaseClause) {
+func (m *Metric) addCaseClause(node *ast.CaseClause) {
 	// no way to distinguish case and default, so just always assume case for now
-	info.addToken(token.CASE)
-	info.addToken(token.COLON)
+	m.addToken(token.CASE)
+	m.addToken(token.COLON)
 }
 
-func (info *Info) AddChanType(node *ast.ChanType) {
-	info.addToken(token.ARROW)
+func (m *Metric) addChanType(node *ast.ChanType) {
+	m.addToken(token.ARROW)
 	if node.Arrow != token.NoPos {
-		info.addToken(token.CHAN)
+		m.addToken(token.CHAN)
 	}
 }
 
-func (info *Info) AddCommClause(node *ast.CommClause) {
+func (m *Metric) addCommClause(node *ast.CommClause) {
 	// no way to distinguish case and default, so just always assume case for now
-	info.addToken(token.CASE)
-	info.addToken(token.COLON)
+	m.addToken(token.CASE)
+	m.addToken(token.COLON)
 }
 
-func (info *Info) AddComment(node *ast.Comment) {
+func (m *Metric) addComment(node *ast.Comment) {
 	// Nothing to count
 }
 
-func (info *Info) AddCommentGroup(node *ast.CommentGroup) {
+func (m *Metric) addCommentGroup(node *ast.CommentGroup) {
 	// Nothing to count
 }
 
-func (info *Info) AddCompositeLit(node *ast.CompositeLit) {
+func (m *Metric) addCompositeLit(node *ast.CompositeLit) {
 	// Maybe also consider `Elts` (e.g. if it always results in commas added)
-	info.addToken(token.LPAREN)
+	m.addToken(token.LPAREN)
 }
 
-func (info *Info) AddDeclStmt(node *ast.DeclStmt) {
+func (m *Metric) addDeclStmt(node *ast.DeclStmt) {
 	// GenDecl is handled separately
 }
 
-func (info *Info) AddDeferStmt(node *ast.DeferStmt) {
-	info.addToken(token.DEFER)
+func (m *Metric) addDeferStmt(node *ast.DeferStmt) {
+	m.addToken(token.DEFER)
 }
 
-func (info *Info) AddEllipsis(node *ast.Ellipsis) {
-	info.addToken(token.ELLIPSIS)
+func (m *Metric) addEllipsis(node *ast.Ellipsis) {
+	m.addToken(token.ELLIPSIS)
 }
 
-func (info *Info) AddEmptyStmt(node *ast.EmptyStmt) {
+func (m *Metric) addEmptyStmt(node *ast.EmptyStmt) {
 	if !node.Implicit {
-		info.addToken(token.SEMICOLON)
+		m.addToken(token.SEMICOLON)
 	}
 }
 
-func (info *Info) AddExprStmt(node *ast.ExprStmt) {
+func (m *Metric) addExprStmt(node *ast.ExprStmt) {
 	// Nothing to count
 }
 
-func (info *Info) AddField(node *ast.Field) {
+func (m *Metric) addField(node *ast.Field) {
 	// Nothing to count
 }
 
-func (info *Info) AddFieldList(node *ast.FieldList) {
+func (m *Metric) addFieldList(node *ast.FieldList) {
 	if node.Opening.IsValid() {
-		info.addToken(token.LPAREN)
+		m.addToken(token.LPAREN)
 	}
 }
 
-func (info *Info) AddFile(node *ast.File) {
-	info.addToken(token.PACKAGE)
+func (m *Metric) addFile(node *ast.File) {
+	m.addToken(token.PACKAGE)
 }
 
-func (info *Info) AddForStmt(node *ast.ForStmt) {
-	info.addToken(token.FOR)
+func (m *Metric) addForStmt(node *ast.ForStmt) {
+	m.addToken(token.FOR)
 }
 
-func (info *Info) AddFuncDecl(node *ast.FuncDecl) {
+func (m *Metric) addFuncDecl(node *ast.FuncDecl) {
 	// Composite type only, nothing
 }
 
-func (info *Info) AddFuncLit(node *ast.FuncLit) {
+func (m *Metric) addFuncLit(node *ast.FuncLit) {
 	// Composite type only, nothing
 }
 
-func (info *Info) AddFuncType(node *ast.FuncType) {
-	info.addToken(token.FUNC)
+func (m *Metric) addFuncType(node *ast.FuncType) {
+	m.addToken(token.FUNC)
 }
 
-func (info *Info) AddGenDecl(node *ast.GenDecl) {
-	info.addToken(node.Tok)
+func (m *Metric) addGenDecl(node *ast.GenDecl) {
+	m.addToken(node.Tok)
 	if node.Lparen.IsValid() {
-		info.addToken(token.LPAREN)
+		m.addToken(token.LPAREN)
 	}
 }
 
-func (info *Info) AddGoStmt(node *ast.GoStmt) {
-	info.addToken(token.GO)
+func (m *Metric) addGoStmt(node *ast.GoStmt) {
+	m.addToken(token.GO)
 }
 
-func (info *Info) AddIdent(node *ast.Ident) {
-	info.operands[node.Name] += 1
+func (m *Metric) addIdent(node *ast.Ident) {
+	m.operands[node.Name] += 1
 }
 
-func (info *Info) AddIfStmt(node *ast.IfStmt) {
-	info.addToken(token.IF)
+func (m *Metric) addIfStmt(node *ast.IfStmt) {
+	m.addToken(token.IF)
 }
 
-func (info *Info) AddImportSpec(node *ast.ImportSpec) {
+func (m *Metric) addImportSpec(node *ast.ImportSpec) {
 	// Composite type only, nothing
 }
 
-func (info *Info) AddIncDecStmt(node *ast.IncDecStmt) {
-	info.addToken(node.Tok)
+func (m *Metric) addIncDecStmt(node *ast.IncDecStmt) {
+	m.addToken(node.Tok)
 }
 
-func (info *Info) AddIndexExpr(node *ast.IndexExpr) {
+func (m *Metric) addIndexExpr(node *ast.IndexExpr) {
 	if node.Lbrack.IsValid() {
-		info.addToken(token.LBRACK)
+		m.addToken(token.LBRACK)
 	}
 }
 
-func (info *Info) AddInterfaceType(node *ast.InterfaceType) {
-	info.addToken(token.INTERFACE)
+func (m *Metric) addInterfaceType(node *ast.InterfaceType) {
+	m.addToken(token.INTERFACE)
 }
 
-func (info *Info) AddKeyValueExpr(node *ast.KeyValueExpr) {
-	info.addToken(token.COLON)
+func (m *Metric) addKeyValueExpr(node *ast.KeyValueExpr) {
+	m.addToken(token.COLON)
 }
 
-func (info *Info) AddLabeledStmt(node *ast.LabeledStmt) {
-	info.addToken(token.COLON)
+func (m *Metric) addLabeledStmt(node *ast.LabeledStmt) {
+	m.addToken(token.COLON)
 }
 
-func (info *Info) AddMapType(node *ast.MapType) {
-	info.addToken(token.MAP)
+func (m *Metric) addMapType(node *ast.MapType) {
+	m.addToken(token.MAP)
 }
 
-func (info *Info) AddPackage(node *ast.Package) {
+func (m *Metric) addPackage(node *ast.Package) {
 	// name should be handled by ident, so ignore is as apparently it is
 	// not a particular part of code but rather abstract entity (set of files?).
 }
 
-func (info *Info) AddParenExpr(node *ast.ParenExpr) {
-	info.addToken(token.LPAREN)
+func (m *Metric) addParenExpr(node *ast.ParenExpr) {
+	m.addToken(token.LPAREN)
 }
 
-func (info *Info) AddRangeStmt(node *ast.RangeStmt) {
-	// for should be already handled by `AddForStmt`
-	info.addToken(node.Tok)
-	info.addToken(token.RANGE)
+func (m *Metric) addRangeStmt(node *ast.RangeStmt) {
+	// for should be already handled by `addForStmt`
+	m.addToken(node.Tok)
+	m.addToken(token.RANGE)
 }
 
-func (info *Info) AddReturnStmt(node *ast.ReturnStmt) {
-	info.addToken(token.RETURN)
+func (m *Metric) addReturnStmt(node *ast.ReturnStmt) {
+	m.addToken(token.RETURN)
 }
 
-func (info *Info) AddSelectStmt(node *ast.SelectStmt) {
-	info.addToken(token.SELECT)
+func (m *Metric) addSelectStmt(node *ast.SelectStmt) {
+	m.addToken(token.SELECT)
 }
 
-func (info *Info) AddSelectorExpr(node *ast.SelectorExpr) {
-	info.addToken(token.PERIOD)
+func (m *Metric) addSelectorExpr(node *ast.SelectorExpr) {
+	m.addToken(token.PERIOD)
 }
 
-func (info *Info) AddSendStmt(node *ast.SendStmt) {
-	info.addToken(token.ARROW)
+func (m *Metric) addSendStmt(node *ast.SendStmt) {
+	m.addToken(token.ARROW)
 }
 
-func (info *Info) AddSliceExpr(node *ast.SliceExpr) {
-	info.addToken(token.LBRACK)
+func (m *Metric) addSliceExpr(node *ast.SliceExpr) {
+	m.addToken(token.LBRACK)
 }
 
-func (info *Info) AddStarExpr(node *ast.StarExpr) {
-	info.addToken(token.MUL)
+func (m *Metric) addStarExpr(node *ast.StarExpr) {
+	m.addToken(token.MUL)
 }
 
-func (info *Info) AddStructType(node *ast.StructType) {
-	info.addToken(token.STRUCT)
+func (m *Metric) addStructType(node *ast.StructType) {
+	m.addToken(token.STRUCT)
 }
 
-func (info *Info) AddSwitchStmt(node *ast.SwitchStmt) {
-	info.addToken(token.SWITCH)
+func (m *Metric) addSwitchStmt(node *ast.SwitchStmt) {
+	m.addToken(token.SWITCH)
 }
 
-func (info *Info) AddTypeAssertExpr(node *ast.TypeAssertExpr) {
-	info.addToken(token.LPAREN)
+func (m *Metric) addTypeAssertExpr(node *ast.TypeAssertExpr) {
+	m.addToken(token.LPAREN)
 }
 
-func (info *Info) AddTypeSpec(node *ast.TypeSpec) {
+func (m *Metric) addTypeSpec(node *ast.TypeSpec) {
 	if node.Assign.IsValid() {
-		info.addToken(token.ASSIGN)
+		m.addToken(token.ASSIGN)
 	}
 }
 
-func (info *Info) AddTypeSwitchStmt(node *ast.TypeSwitchStmt) {
-	info.addToken(token.SWITCH)
+func (m *Metric) addTypeSwitchStmt(node *ast.TypeSwitchStmt) {
+	m.addToken(token.SWITCH)
 }
 
-func (info *Info) AddUnaryExpr(node *ast.UnaryExpr) {
-	info.addToken(node.Op)
+func (m *Metric) addUnaryExpr(node *ast.UnaryExpr) {
+	m.addToken(node.Op)
 }
 
-func (info *Info) AddValueSpec(node *ast.ValueSpec) {
+func (m *Metric) addValueSpec(node *ast.ValueSpec) {
 	// Something composite only, ignore
 }
