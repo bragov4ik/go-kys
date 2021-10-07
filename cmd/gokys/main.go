@@ -53,8 +53,7 @@ func main() {
 	files := getFiles(flag.Args())
 
 	fset := token.NewFileSet()
-	measurer := wmfp.NewMeasurerWMFP()
-	measurer.Configure(&cfg)
+	measurer := wmfp.NewMeasurerWMFP(&cfg)
 
 	for _, file := range files {
 		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)

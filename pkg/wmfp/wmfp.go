@@ -25,18 +25,17 @@ type Config struct {
 	Comment   comments.Weights `xml:"comment"`
 }
 
-func NewMeasurerWMFP() MeasurerWMFP {
+func NewMeasurerWMFP(config *Config) MeasurerWMFP {
 	halst := halstead.NewMetric()
 	return MeasurerWMFP{
-		Comments: &comments.Metric{},
-		Cyclo:    &cyclo.Metric{},
-		Halst:    &halst,
+		Comments: &comments.Metric{
+			Config: config.Comment,
+		},
+		Cyclo: &cyclo.Metric{
+			Config: config.CycloComp,
+		},
+		Halst: &halst,
 	}
-}
-
-func (m *MeasurerWMFP) Configure(config *Config) {
-	m.Comments.Config = config.Comment
-	m.Cyclo.Config = config.CycloComp
 }
 
 func (m *MeasurerWMFP) ParseFile(file *ast.File) {
