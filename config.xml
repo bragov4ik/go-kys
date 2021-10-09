@@ -8,6 +8,9 @@
         <and>1</and>
         <or>1</or>
     </cyclomatic>
+    <comment>
+        <word>1</word>
+    </comment>
     <codestruct>
         <func>1</func>
         <struct>1</struct>
