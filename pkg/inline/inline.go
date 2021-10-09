@@ -31,17 +31,18 @@ func (m Metric) Finish() float64 {
 
 func getInlineComp(literal *ast.BasicLit, config *Weights) uint {
 	var comp uint
+	len := uint(len(literal.Value))
 	switch literal.Kind {
 	case token.INT:
-		comp = config.Int
+		comp = config.Int * len
 	case token.FLOAT:
-		comp = config.Float
+		comp = config.Float * len
 	case token.IMAG:
-		comp = config.Imag
+		comp = config.Imag * len
 	case token.CHAR:
-		comp = config.Char
+		comp = config.Char * len
 	case token.STRING:
-		comp = config.String
+		comp = config.String * len
 	}
 	return comp
 }
