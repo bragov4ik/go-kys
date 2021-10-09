@@ -34,13 +34,13 @@ func getInlineComp(literal *ast.BasicLit, config *Weights) uint {
 	len := uint(len(literal.Value))
 	switch literal.Kind {
 	case token.INT:
-		comp = config.Int * len
+		comp = config.Int
 	case token.FLOAT:
-		comp = config.Float * len
+		comp = config.Float
 	case token.IMAG:
-		comp = config.Imag * len
+		comp = config.Imag
 	case token.CHAR:
-		comp = config.Char * len
+		comp = config.Char
 	case token.STRING:
 		comp = config.String * len
 	}
