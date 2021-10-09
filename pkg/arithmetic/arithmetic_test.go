@@ -1,4 +1,4 @@
-package inline
+package arithmetic
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestInlineData(t *testing.T) {
+func TestArithmeticComp(t *testing.T) {
 	type args struct {
 		n ast.Node
 	}
@@ -16,55 +16,57 @@ func TestInlineData(t *testing.T) {
 		src  string
 		want float64
 	}{
-		{`package main
+		{
+			`package main
 
-	import (
-		"fmt"
-	)
-		
+			import (
+				"fmt"
+			)
+					
+			func main(){
+				fmt.Printf("Result: %v", 1+2-3*4/5%6)
+			}`,
+			5,
+		},
+		{
+			`package main
 
-	func foo(t int) float64 {
-		a := 123
-		b := 1.23
-		return float64(a+t) + b
-	}
-			
-	func main(){
-		fmt.Printf("Result: %v", foo(1))
-	}`, 23},
-		{`package main
+			import (
+				"fmt"
+			)
+					
+			func main(){
+				a := 0
+				a += 1
+				a -= 2
+				a *= 3
+				a %= 4
+				a /= 5
+				fmt.Printf("Result: %v", a)
+			}`,
+			5,
+		},
+		{
+			`package main
 
-	import (
-		"fmt"
-	)
-	
-	func foo(t int) complex128 {
-		a := 'a'
-		b := 32i
-		result := (complex(float64(t), 0) + b)
-		fmt.Printf("%s = %v\n", string(a), result)
-		return result
+			import (
+				"fmt"
+			)
+					
+			func main(){
+				a := 0
+				a++
+				a++
+				a--
+				a++
+				a--
+				a++
+				fmt.Printf("Result: %v", a)
+			}`,
+			6,
+		},
 	}
-	
-	func main() {
-		fmt.Printf("Result: %v\n", foo(1))
-	}`, 37},
-		{`package main
-
-	import (
-		"fmt"
-	)
-	
-	func foo() {
-		a := struct{Num uint; Value string}{10, "val",};
-		fmt.Printf("%v = {%v, %v}\n", "a", a.Num, a.Value)
-	}
-	
-	func main() {
-		foo()
-	}`, 37},
-	}
-	cfg := Weights{Int: 2, Float: 2, Imag: 2, Char: 1, String: 1, CompositeLit: 5}
+	cfg := Weights{Add: 1, Sub: 1, Mul: 1, Quo: 1, Rem: 1, AddAssign: 1, SubAssign: 1, MulAssign: 1, QuoAssign: 1, RemAssign: 1, Inc: 1, Dec: 1}
 	tests := make([]struct {
 		name string
 		m    *Metric

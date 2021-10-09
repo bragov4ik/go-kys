@@ -24,4 +24,18 @@
         <string>1</string>
         <composite>1</composite>
     </inline>
+    <arithmetic>
+        <add>1</add>
+        <sub>1</sub>
+        <mul>1</mul>
+        <quo>1</quo>
+        <rem>1</rem>
+        <add_assign>1</add_assign>
+        <sub_assign>1</sub_assign>
+        <mul_assign>1</mul_assign>
+        <quo_assign>1</quo_assign>
+        <rem_assign>1</rem_assign>
+        <inc>1</inc>
+        <dec>1</dec>
+    </arithmetic>
 </config>
