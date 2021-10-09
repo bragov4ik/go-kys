@@ -62,9 +62,9 @@ func TestInlineData(t *testing.T) {
 	
 	func main() {
 		foo()
-	}`, 32},
+	}`, 37},
 	}
-	cfg := Weights{Int: 2, Float: 2, Imag: 2, Char: 1, String: 1}
+	cfg := Weights{Int: 2, Float: 2, Imag: 2, Char: 1, String: 1, CompositeLit: 5}
 	tests := make([]struct {
 		name string
 		m    *Metric
