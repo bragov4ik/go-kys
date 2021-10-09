@@ -24,11 +24,11 @@ func getCodeStructComp(n ast.Node, cfg *Weights) uint {
 
 	switch n.(type) {
 	case *ast.StructType:
-		comp += cfg.Struct
+		comp = cfg.Struct
 	case *ast.FuncDecl:
-		comp += cfg.Func
+		comp = cfg.Func
 	case *ast.InterfaceType:
-		comp += cfg.Interface
+		comp = cfg.Interface
 	}
 
 	return comp
