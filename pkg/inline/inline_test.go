@@ -37,7 +37,7 @@ func main(){
 		return true
 	})
 	got := m.Finish()
-	want := 33.
+	want := 23.
 	if want != got {
 		t.Errorf("TestCodeStructComp got %v, want %v", got, want)
 	}
@@ -74,7 +74,7 @@ func TestInlineData2(t *testing.T) {
 		return true
 	})
 	got := m.Finish()
-	want := 43.
+	want := 37.
 	if want != got {
 		t.Errorf("TestCodeStructComp got %v, want %v", got, want)
 	}
