@@ -25,13 +25,13 @@ func TestCodeStructComp(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	got := uint(0)
+	m := Metric{Config: Weights{Struct: 1, Func: 1, Interface: 1}}
 
 	ast.Inspect(file, func(n ast.Node) bool {
-		got += getCodeStructComp(n, &Weights{Struct: 1, Func: 1, Interface: 1})
+		m.ParseNode(n)
 		return true
 	})
-
+	got := m.Comp
 	want := uint(6)
 	if want != got {
 		t.Errorf("TestCodeStructComp got %v, want %v", got, want)
