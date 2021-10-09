@@ -22,5 +22,6 @@
         <imag>1</imag>
         <char>1</char>
         <string>1</string>
+        <composite>1</composite>
     </inline>
 </config>
