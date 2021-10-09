@@ -6,11 +6,12 @@ import (
 )
 
 type Weights struct {
-	Int    uint `xml:"int"`
-	Float  uint `xml:"float"`
-	Imag   uint `xml:"imag"`
-	Char   uint `xml:"char"`
-	String uint `xml:"string"`
+	Int          uint `xml:"int"`
+	Float        uint `xml:"float"`
+	Imag         uint `xml:"imag"`
+	Char         uint `xml:"char"`
+	String       uint `xml:"string"`
+	CompositeLit uint `xml:"composite"`
 }
 
 type Metric struct {
@@ -19,9 +20,11 @@ type Metric struct {
 }
 
 func (m *Metric) ParseNode(n ast.Node) {
-	v, ok := n.(*ast.BasicLit)
-	if ok {
-		m.Comp += getInlineComp(v, &m.Config)
+	switch v := n.(type) {
+	case *ast.BasicLit:
+		m.Comp += getBasicLitComp(v, &m.Config)
+	case *ast.CompositeLit:
+		m.Comp += m.Config.CompositeLit
 	}
 }
 
@@ -29,7 +32,7 @@ func (m Metric) Finish() float64 {
 	return float64(m.Comp)
 }
 
-func getInlineComp(literal *ast.BasicLit, config *Weights) uint {
+func getBasicLitComp(literal *ast.BasicLit, config *Weights) uint {
 	var comp uint
 	len := uint(len(literal.Value))
 	switch literal.Kind {
