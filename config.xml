@@ -13,4 +13,11 @@
         <struct>1</struct>
         <interface>1</interface>
     </codestruct>
+    <inline>
+        <int>1</int>
+        <float>1</float>
+        <imag>1</imag>
+        <char>1</char>
+        <string>1</string>
+    </inline>
 </config>

@@ -6,11 +6,11 @@ import (
 )
 
 type Weights struct {
-	Int    uint
-	Float  uint
-	Imag   uint
-	Char   uint
-	String uint
+	Int    uint `xml:"int"`
+	Float  uint `xml:"float"`
+	Imag   uint `xml:"imag"`
+	Char   uint `xml:"char"`
+	String uint `xml:"string"`
 }
 
 type Metric struct {
