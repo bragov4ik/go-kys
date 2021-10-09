@@ -36,8 +36,8 @@ func main(){
 		m.ParseNode(n)
 		return true
 	})
-	got := m.Comp
-	want := uint(33)
+	got := m.Finish()
+	want := 33.
 	if want != got {
 		t.Errorf("TestCodeStructComp got %v, want %v", got, want)
 	}
@@ -73,8 +73,8 @@ func TestInlineData2(t *testing.T) {
 		m.ParseNode(n)
 		return true
 	})
-	got := m.Comp
-	want := uint(43)
+	got := m.Finish()
+	want := 43.
 	if want != got {
 		t.Errorf("TestCodeStructComp got %v, want %v", got, want)
 	}
