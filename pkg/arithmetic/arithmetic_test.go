@@ -16,55 +16,9 @@ func TestArithmeticComp(t *testing.T) {
 		src  string
 		want float64
 	}{
-		{
-			`package main
-
-			import (
-				"fmt"
-			)
-					
-			func main(){
-				fmt.Printf("Result: %v", 1+2-3*4/5%6)
-			}`,
-			5,
-		},
-		{
-			`package main
-
-			import (
-				"fmt"
-			)
-					
-			func main(){
-				a := 0
-				a += 1
-				a -= 2
-				a *= 3
-				a %= 4
-				a /= 5
-				fmt.Printf("Result: %v", a)
-			}`,
-			5,
-		},
-		{
-			`package main
-
-			import (
-				"fmt"
-			)
-					
-			func main(){
-				a := 0
-				a++
-				a++
-				a--
-				a++
-				a--
-				a++
-				fmt.Printf("Result: %v", a)
-			}`,
-			6,
-		},
+		{`package main; func main(){ a := 1+2-3*4/5%6 }`, 5},
+		{`package main; func main(){ a := -0; a+=1; a-=2; a*=3; a%=4; a/=5 }`, 6},
+		{`package main; func main(){ a := +0; a++; a++; a--; a++; a--; a++ }`, 7},
 	}
 	cfg := Weights{Add: 1, Sub: 1, Mul: 1, Quo: 1, Rem: 1, AddAssign: 1, SubAssign: 1, MulAssign: 1, QuoAssign: 1, RemAssign: 1, Inc: 1, Dec: 1}
 	tests := make([]struct {
