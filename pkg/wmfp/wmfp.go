@@ -4,15 +4,17 @@ import (
 	"go/ast"
 	"reflect"
 
+	codestruct "github.com/bragov4ik/go-kys/pkg/codestruct"
 	comments "github.com/bragov4ik/go-kys/pkg/comments"
 	cyclo "github.com/bragov4ik/go-kys/pkg/cyclocomp"
 	halstead "github.com/bragov4ik/go-kys/pkg/halstead"
 )
 
 type MeasurerWMFP struct {
-	Comments *comments.Metric
-	Cyclo    *cyclo.Metric
-	Halst    *halstead.Metric
+	Comments   *comments.Metric
+	Cyclo      *cyclo.Metric
+	Halst      *halstead.Metric
+	Codestruct *codestruct.Metric
 }
 
 type Metric interface {
@@ -21,8 +23,9 @@ type Metric interface {
 }
 
 type Config struct {
-	CycloComp cyclo.Weights    `xml:"cyclomatic"`
-	Comment   comments.Weights `xml:"comment"`
+	CycloComp      cyclo.Weights      `xml:"cyclomatic"`
+	Comment        comments.Weights   `xml:"comment"`
+	CodeStructComp codestruct.Weights `xml:"codestruct"`
 }
 
 func NewMeasurerWMFP(config *Config) MeasurerWMFP {
@@ -35,6 +38,9 @@ func NewMeasurerWMFP(config *Config) MeasurerWMFP {
 			Config: config.CycloComp,
 		},
 		Halst: &halst,
+		Codestruct: &codestruct.Metric{
+			Config: config.CodeStructComp,
+		},
 	}
 }
 
