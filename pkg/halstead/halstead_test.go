@@ -53,11 +53,30 @@ func TestTokenInArr(t *testing.T) {
 	}
 }
 
-func TestMetric(t *testing.T) {
-	metric := NewMetric()
-	// Code taken from A Tour of Go
-	source := `package main
+type Result struct {
+	n1 uint
+	n2 uint
+	N1 uint
+	N2 uint
+}
 
+func getMetric(source string) Result {
+	m := NewMetric()
+	file, err := parser.ParseFile(token.NewFileSet(), "", "package main;"+source, parser.ParseComments)
+	if err != nil {
+		panic(err)
+	}
+
+	ast.Inspect(file, func(n ast.Node) bool {
+		m.ParseNode(n)
+		return true
+	})
+
+	return Result{m.n1Distinct(), m.n2Distinct(), m.n1Total(), m.n2Total()}
+}
+
+func TestMetric(t *testing.T) {
+	tourOfGo := `
 	import "fmt"
 	
 	const (
@@ -72,43 +91,55 @@ func TestMetric(t *testing.T) {
 	func needFloat(x float64) float64 {
 		return x * 0.1
 	}
-	
+
 	func main() {
 		fmt.Println(needInt(Small))
 		// fmt.Println(needInt(Big))
 		fmt.Println(needFloat(Small))
 		fmt.Println(needFloat(Big))
-	}
-	`
-	type result struct {
-		n1 uint
-		n2 uint
-		N1 uint
-		N2 uint
+	}`
+
+	tests := []struct {
+		Name   string
+		Source string
+		Want   Result
+	}{
+		{"tourOfGo", tourOfGo, Result{12, 16, 34, 29}},
+		{"addAssign", `func f() { x := 0; x += 2 }`, Result{6, 5, 6, 6}},
+		{"branchStmt", `func f() { for _, _ := range []int{} { break } }`, Result{7, 4, 5, 9}},
+		{"caseClause", `func f() { switch 10 { case 1: default: }}`, Result{7, 4, 4, 10}},
+		{"declStmt", `type X int; const I = 1; var a int`, Result{4, 6, 7, 4}},
+		{"ellipsis", `func f(aboba ...int) { f(aboba...) }`, Result{5, 4, 6, 6}},
+		{"emptyStmt", `func f() { ; }`, Result{5, 2, 2, 5}},
+		{"forStmt", `func f() { for i := 0; i < 0; i++ {} }`, Result{8, 4, 7, 9}},
+		{"channels", `func f(i chan int) { select { case a := <-i: i <- a } }`, Result{9, 5, 8, 12}},
+		{"defer", `func f() { defer f() }`, Result{5, 2, 3, 6}},
+		{"go", `func f() { go f() }`, Result{5, 2, 3, 6}},
+		{"if", `func f() bool { if f() { return false } else { return true } }`, Result{6, 5, 6, 10}},
+		{"index", `func f(a []int) int { return a[0] }`, Result{6, 5, 7, 6}},
+		{"interface", `type Aboba interface { Aboba() bool }`, Result{5, 3, 4, 6}},
+		{"keyvalue-expr", `var a = map[string]int{"a": 1}`, Result{5, 6, 6, 5}},
+		{"goto", `func x() { start: for { goto start }}`, Result{7, 3, 4, 8}},
+		{"misc", `
+		type S struct {}
+		type E = <-chan int
+
+		func x() { if true || (false && true) {} }
+		func y(a *int) { *a = 0 }
+		func z(a []int) []int { return a[1:]}
+		func a(b interface{}) int {
+			switch b.(type) {
+			case int:
+				return b.(int)
+			}
+		}
+		`, Result{19, 13, 26, 39}},
 	}
 
-	notEqual := func(r1 result, r2 result) bool {
-		return r1.n1 != r2.n1 || r1.n2 != r2.n2 || r1.N1 != r2.N1 || r1.N2 != r2.N2
-	}
-
-	want := result{12, 16, 34, 29}
-	file, err := parser.ParseFile(token.NewFileSet(), "", source, parser.ParseComments)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ast.Inspect(file, func(n ast.Node) bool {
-		metric.ParseNode(n)
-		return true
-	})
-
-	got := result{
-		metric.getN1Distinct(),
-		metric.getN2Distinct(),
-		metric.getN1Total(),
-		metric.getN2Total(),
-	}
-	if notEqual(want, got) {
-		t.Errorf("result{metric.getN1Distinct(), metric.getN2Distinct(), metric.getN1Total(), metric.getN2Total(),} = %v, want %v", got, want)
+	for _, test := range tests {
+		got := getMetric(test.Source)
+		if test.Want != got {
+			t.Errorf("%v: result{N1Distinct, N2Distinct, N1Total, N2Total} = %v, want %v", test.Name, got, test.Want)
+		}
 	}
 }

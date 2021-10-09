@@ -1,38 +1,27 @@
 package halstead
 
 import (
-	"fmt"
 	"go/ast"
 	"go/token"
 	"math"
-
-	"github.com/k0kubun/pp/v3"
 )
 
 type Metric struct {
-	operators map[string]uint
+	operators map[token.Token]uint
 	operands  map[string]uint
 }
 
 func NewMetric() Metric {
 	return Metric{
-		operators: make(map[string]uint),
+		operators: make(map[token.Token]uint),
 		operands:  make(map[string]uint),
 	}
 }
 
 func (m *Metric) ParseNode(n ast.Node) {
 	switch v := n.(type) {
-	case *ast.ArrayType:
-		m.addArrayType(v)
 	case *ast.AssignStmt:
 		m.addAssignStmt(v)
-	case *ast.BadDecl:
-		m.addBadDecl(v)
-	case *ast.BadExpr:
-		m.addBadExpr(v)
-	case *ast.BadStmt:
-		m.addBadStmt(v)
 	case *ast.BasicLit:
 		m.addBasicLit(v)
 	case *ast.BinaryExpr:
@@ -49,34 +38,20 @@ func (m *Metric) ParseNode(n ast.Node) {
 		m.addChanType(v)
 	case *ast.CommClause:
 		m.addCommClause(v)
-	case *ast.Comment:
-		m.addComment(v)
-	case *ast.CommentGroup:
-		m.addCommentGroup(v)
 	case *ast.CompositeLit:
 		m.addCompositeLit(v)
-	case *ast.DeclStmt:
-		m.addDeclStmt(v)
 	case *ast.DeferStmt:
 		m.addDeferStmt(v)
 	case *ast.Ellipsis:
 		m.addEllipsis(v)
 	case *ast.EmptyStmt:
 		m.addEmptyStmt(v)
-	case *ast.ExprStmt:
-		m.addExprStmt(v)
-	case *ast.Field:
-		m.addField(v)
 	case *ast.FieldList:
 		m.addFieldList(v)
 	case *ast.File:
 		m.addFile(v)
 	case *ast.ForStmt:
 		m.addForStmt(v)
-	case *ast.FuncDecl:
-		m.addFuncDecl(v)
-	case *ast.FuncLit:
-		m.addFuncLit(v)
 	case *ast.FuncType:
 		m.addFuncType(v)
 	case *ast.GenDecl:
@@ -87,8 +62,6 @@ func (m *Metric) ParseNode(n ast.Node) {
 		m.addIdent(v)
 	case *ast.IfStmt:
 		m.addIfStmt(v)
-	case *ast.ImportSpec:
-		m.addImportSpec(v)
 	case *ast.IncDecStmt:
 		m.addIncDecStmt(v)
 	case *ast.IndexExpr:
@@ -101,8 +74,6 @@ func (m *Metric) ParseNode(n ast.Node) {
 		m.addLabeledStmt(v)
 	case *ast.MapType:
 		m.addMapType(v)
-	case *ast.Package:
-		m.addPackage(v)
 	case *ast.ParenExpr:
 		m.addParenExpr(v)
 	case *ast.RangeStmt:
@@ -131,35 +102,33 @@ func (m *Metric) ParseNode(n ast.Node) {
 		m.addTypeSwitchStmt(v)
 	case *ast.UnaryExpr:
 		m.addUnaryExpr(v)
-	case *ast.ValueSpec:
-		m.addValueSpec(v)
-	default:
-		if n != nil {
-			fmt.Printf("Unhandled type: %T ", v)
-			pp.Printf("%v\n", n)
-		}
 	}
 }
 
 func (m Metric) Finish() float64 {
-	n1 := float64(m.getN1Distinct())
-	n2 := float64(m.getN2Distinct())
-	N1 := float64(m.getN1Total())
-	N2 := float64(m.getN2Total())
+	n1 := float64(m.n1Distinct())
+	n2 := float64(m.n2Distinct())
+	N1 := float64(m.n1Total())
+	N2 := float64(m.n2Total())
 	return (N1 + N2) * math.Log2(n1+n2)
 }
 
-func (m *Metric) getN1Distinct() uint {
-	return uint(len(m.operators))
-}
-
-func (m *Metric) getN2Distinct() uint {
-	return uint(len(m.operands))
-}
+func (m *Metric) n1Distinct() uint { return uint(len(m.operators)) }
+func (m *Metric) n2Distinct() uint { return uint(len(m.operands)) }
 
 // Not universal key type because using interfaces is nasty
 // and generics (with 1.18 version) are not released yet
 func sumMap(targetMap map[string]uint) uint {
+	var total uint = 0
+	for _, count := range targetMap {
+		total += count
+	}
+	return total
+}
+
+// Not universal key type because using interfaces is nasty
+// and generics (with 1.18 version) are not released yet
+func sumMapTok(targetMap map[token.Token]uint) uint {
 	var total uint = 0
 	for _, count := range targetMap {
 		total += count
@@ -176,17 +145,10 @@ func tokenInArr(tok token.Token, arr []token.Token) bool {
 	return false
 }
 
-func (m *Metric) getN1Total() uint {
-	return sumMap(m.operands)
-}
-
-func (m *Metric) getN2Total() uint {
-	return sumMap(m.operators)
-}
+func (m *Metric) n1Total() uint { return sumMap(m.operands) }
+func (m *Metric) n2Total() uint { return sumMapTok(m.operators) }
 
 func (m *Metric) addToken(nextToken token.Token) {
-	tokenName := fmt.Sprintf("token:%s", nextToken.String())
-
 	NOT_OPERATORS := []token.Token{
 		token.ILLEGAL,
 		token.EOF,
@@ -200,36 +162,18 @@ func (m *Metric) addToken(nextToken token.Token) {
 	}
 
 	if !tokenInArr(nextToken, NOT_OPERATORS[:]) {
-		m.operators[tokenName] += 1
+		m.operators[nextToken] += 1
 	}
 }
 
 // TODO count commas
-
-func (m *Metric) addArrayType(node *ast.ArrayType) {
-	// Nothing to count
-}
 
 func (m *Metric) addAssignStmt(node *ast.AssignStmt) {
 	// lhs and rhs should be visited in walk (expr contains node)
 	m.addToken(node.Tok)
 }
 
-func (m *Metric) addBadDecl(node *ast.BadDecl) {
-	// Nothing to count
-}
-
-func (m *Metric) addBadExpr(node *ast.BadExpr) {
-	// Nothing to count
-}
-
-func (m *Metric) addBadStmt(node *ast.BadStmt) {
-	// Nothing to count
-}
-
-func (m *Metric) addBasicLit(node *ast.BasicLit) {
-	m.operands[node.Value] += 1
-}
+func (m *Metric) addBasicLit(node *ast.BasicLit) { m.operands[node.Value] += 1 }
 
 func (m *Metric) addBinaryExpr(node *ast.BinaryExpr) {
 	// x and y should be visited in walk (expr contains node)
@@ -241,9 +185,7 @@ func (m *Metric) addBlockStmt(node *ast.BlockStmt) {
 	m.addToken(token.LBRACE)
 }
 
-func (m *Metric) addBranchStmt(node *ast.BranchStmt) {
-	m.addToken(node.Tok)
-}
+func (m *Metric) addBranchStmt(node *ast.BranchStmt) { m.addToken(node.Tok) }
 
 func (m *Metric) addCallExpr(node *ast.CallExpr) {
 	// leave expressions for further walk
@@ -271,43 +213,18 @@ func (m *Metric) addCommClause(node *ast.CommClause) {
 	m.addToken(token.COLON)
 }
 
-func (m *Metric) addComment(node *ast.Comment) {
-	// Nothing to count
-}
-
-func (m *Metric) addCommentGroup(node *ast.CommentGroup) {
-	// Nothing to count
-}
-
 func (m *Metric) addCompositeLit(node *ast.CompositeLit) {
 	// Maybe also consider `Elts` (e.g. if it always results in commas added)
 	m.addToken(token.LPAREN)
 }
 
-func (m *Metric) addDeclStmt(node *ast.DeclStmt) {
-	// GenDecl is handled separately
-}
-
-func (m *Metric) addDeferStmt(node *ast.DeferStmt) {
-	m.addToken(token.DEFER)
-}
-
-func (m *Metric) addEllipsis(node *ast.Ellipsis) {
-	m.addToken(token.ELLIPSIS)
-}
+func (m *Metric) addDeferStmt(node *ast.DeferStmt) { m.addToken(token.DEFER) }
+func (m *Metric) addEllipsis(node *ast.Ellipsis)   { m.addToken(token.ELLIPSIS) }
 
 func (m *Metric) addEmptyStmt(node *ast.EmptyStmt) {
 	if !node.Implicit {
 		m.addToken(token.SEMICOLON)
 	}
-}
-
-func (m *Metric) addExprStmt(node *ast.ExprStmt) {
-	// Nothing to count
-}
-
-func (m *Metric) addField(node *ast.Field) {
-	// Nothing to count
 }
 
 func (m *Metric) addFieldList(node *ast.FieldList) {
@@ -316,25 +233,9 @@ func (m *Metric) addFieldList(node *ast.FieldList) {
 	}
 }
 
-func (m *Metric) addFile(node *ast.File) {
-	m.addToken(token.PACKAGE)
-}
-
-func (m *Metric) addForStmt(node *ast.ForStmt) {
-	m.addToken(token.FOR)
-}
-
-func (m *Metric) addFuncDecl(node *ast.FuncDecl) {
-	// Composite type only, nothing
-}
-
-func (m *Metric) addFuncLit(node *ast.FuncLit) {
-	// Composite type only, nothing
-}
-
-func (m *Metric) addFuncType(node *ast.FuncType) {
-	m.addToken(token.FUNC)
-}
+func (m *Metric) addFile(node *ast.File)         { m.addToken(token.PACKAGE) }
+func (m *Metric) addForStmt(node *ast.ForStmt)   { m.addToken(token.FOR) }
+func (m *Metric) addFuncType(node *ast.FuncType) { m.addToken(token.FUNC) }
 
 func (m *Metric) addGenDecl(node *ast.GenDecl) {
 	m.addToken(node.Tok)
@@ -343,25 +244,10 @@ func (m *Metric) addGenDecl(node *ast.GenDecl) {
 	}
 }
 
-func (m *Metric) addGoStmt(node *ast.GoStmt) {
-	m.addToken(token.GO)
-}
-
-func (m *Metric) addIdent(node *ast.Ident) {
-	m.operands[node.Name] += 1
-}
-
-func (m *Metric) addIfStmt(node *ast.IfStmt) {
-	m.addToken(token.IF)
-}
-
-func (m *Metric) addImportSpec(node *ast.ImportSpec) {
-	// Composite type only, nothing
-}
-
-func (m *Metric) addIncDecStmt(node *ast.IncDecStmt) {
-	m.addToken(node.Tok)
-}
+func (m *Metric) addGoStmt(node *ast.GoStmt)         { m.addToken(token.GO) }
+func (m *Metric) addIdent(node *ast.Ident)           { m.operands[node.Name] += 1 }
+func (m *Metric) addIfStmt(node *ast.IfStmt)         { m.addToken(token.IF) }
+func (m *Metric) addIncDecStmt(node *ast.IncDecStmt) { m.addToken(node.Tok) }
 
 func (m *Metric) addIndexExpr(node *ast.IndexExpr) {
 	if node.Lbrack.IsValid() {
@@ -369,30 +255,11 @@ func (m *Metric) addIndexExpr(node *ast.IndexExpr) {
 	}
 }
 
-func (m *Metric) addInterfaceType(node *ast.InterfaceType) {
-	m.addToken(token.INTERFACE)
-}
-
-func (m *Metric) addKeyValueExpr(node *ast.KeyValueExpr) {
-	m.addToken(token.COLON)
-}
-
-func (m *Metric) addLabeledStmt(node *ast.LabeledStmt) {
-	m.addToken(token.COLON)
-}
-
-func (m *Metric) addMapType(node *ast.MapType) {
-	m.addToken(token.MAP)
-}
-
-func (m *Metric) addPackage(node *ast.Package) {
-	// name should be handled by ident, so ignore is as apparently it is
-	// not a particular part of code but rather abstract entity (set of files?).
-}
-
-func (m *Metric) addParenExpr(node *ast.ParenExpr) {
-	m.addToken(token.LPAREN)
-}
+func (m *Metric) addInterfaceType(node *ast.InterfaceType) { m.addToken(token.INTERFACE) }
+func (m *Metric) addKeyValueExpr(node *ast.KeyValueExpr)   { m.addToken(token.COLON) }
+func (m *Metric) addLabeledStmt(node *ast.LabeledStmt)     { m.addToken(token.COLON) }
+func (m *Metric) addMapType(node *ast.MapType)             { m.addToken(token.MAP) }
+func (m *Metric) addParenExpr(node *ast.ParenExpr)         { m.addToken(token.LPAREN) }
 
 func (m *Metric) addRangeStmt(node *ast.RangeStmt) {
 	// for should be already handled by `addForStmt`
@@ -400,41 +267,15 @@ func (m *Metric) addRangeStmt(node *ast.RangeStmt) {
 	m.addToken(token.RANGE)
 }
 
-func (m *Metric) addReturnStmt(node *ast.ReturnStmt) {
-	m.addToken(token.RETURN)
-}
-
-func (m *Metric) addSelectStmt(node *ast.SelectStmt) {
-	m.addToken(token.SELECT)
-}
-
-func (m *Metric) addSelectorExpr(node *ast.SelectorExpr) {
-	m.addToken(token.PERIOD)
-}
-
-func (m *Metric) addSendStmt(node *ast.SendStmt) {
-	m.addToken(token.ARROW)
-}
-
-func (m *Metric) addSliceExpr(node *ast.SliceExpr) {
-	m.addToken(token.LBRACK)
-}
-
-func (m *Metric) addStarExpr(node *ast.StarExpr) {
-	m.addToken(token.MUL)
-}
-
-func (m *Metric) addStructType(node *ast.StructType) {
-	m.addToken(token.STRUCT)
-}
-
-func (m *Metric) addSwitchStmt(node *ast.SwitchStmt) {
-	m.addToken(token.SWITCH)
-}
-
-func (m *Metric) addTypeAssertExpr(node *ast.TypeAssertExpr) {
-	m.addToken(token.LPAREN)
-}
+func (m *Metric) addReturnStmt(node *ast.ReturnStmt)         { m.addToken(token.RETURN) }
+func (m *Metric) addSelectStmt(node *ast.SelectStmt)         { m.addToken(token.SELECT) }
+func (m *Metric) addSelectorExpr(node *ast.SelectorExpr)     { m.addToken(token.PERIOD) }
+func (m *Metric) addSendStmt(node *ast.SendStmt)             { m.addToken(token.ARROW) }
+func (m *Metric) addSliceExpr(node *ast.SliceExpr)           { m.addToken(token.LBRACK) }
+func (m *Metric) addStarExpr(node *ast.StarExpr)             { m.addToken(token.MUL) }
+func (m *Metric) addStructType(node *ast.StructType)         { m.addToken(token.STRUCT) }
+func (m *Metric) addSwitchStmt(node *ast.SwitchStmt)         { m.addToken(token.SWITCH) }
+func (m *Metric) addTypeAssertExpr(node *ast.TypeAssertExpr) { m.addToken(token.LPAREN) }
 
 func (m *Metric) addTypeSpec(node *ast.TypeSpec) {
 	if node.Assign.IsValid() {
@@ -442,14 +283,5 @@ func (m *Metric) addTypeSpec(node *ast.TypeSpec) {
 	}
 }
 
-func (m *Metric) addTypeSwitchStmt(node *ast.TypeSwitchStmt) {
-	m.addToken(token.SWITCH)
-}
-
-func (m *Metric) addUnaryExpr(node *ast.UnaryExpr) {
-	m.addToken(node.Op)
-}
-
-func (m *Metric) addValueSpec(node *ast.ValueSpec) {
-	// Something composite only, ignore
-}
+func (m *Metric) addTypeSwitchStmt(node *ast.TypeSwitchStmt) { m.addToken(token.SWITCH) }
+func (m *Metric) addUnaryExpr(node *ast.UnaryExpr)           { m.addToken(node.Op) }

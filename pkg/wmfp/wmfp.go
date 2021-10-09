@@ -66,8 +66,7 @@ func (m *MeasurerWMFP) ParseFile(file *ast.File) {
 func (measurer *MeasurerWMFP) Finish() (total float64) {
 	v := reflect.ValueOf(*measurer)
 	for i := 0; i < v.NumField(); i++ {
-		m, ok := v.Field(i).Interface().(Metric)
-		if ok {
+		if m, ok := v.Field(i).Interface().(Metric); ok {
 			total += m.Finish()
 		}
 	}
@@ -77,8 +76,7 @@ func (measurer *MeasurerWMFP) Finish() (total float64) {
 func (measurer *MeasurerWMFP) parseNode(n ast.Node) {
 	v := reflect.ValueOf(*measurer)
 	for i := 0; i < v.NumField(); i++ {
-		m, ok := v.Field(i).Interface().(Metric)
-		if ok {
+		if m, ok := v.Field(i).Interface().(Metric); ok {
 			m.ParseNode(n)
 		}
 	}
