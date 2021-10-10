@@ -5,7 +5,7 @@
 # Go knowledge yield summary
 
 ## Project demo
-<img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/>
+<a href="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq"><img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/></a>
 
 ## Table of Contents
 
