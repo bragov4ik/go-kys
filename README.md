@@ -5,7 +5,7 @@
 # Go knowledge yield summary
 
 ## Project demo
-<img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/>
+<a href="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq"><img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/></a>
 
 ## Table of Contents
 
@@ -102,7 +102,7 @@ To contribute to the project fork the repository and make a PR.
 Since there is no comprehensive description of the work of WMFP in open sources, some metrics were not implemented and some
 were implemented using our vision and understanding of these metrics.
 
-## RUP filled template
+## RUP artifact
 [Link](https://docs.google.com/document/d/1su-LKhZ33DbZ898iwvInVrTbZTy12idO/edit?usp=sharing&ouid=106194539643127537689&rtpof=true&sd=true)
 
 ## Authors
