@@ -2,11 +2,31 @@
 
 <img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/>
 
+## Table of Content
+
+- [Table of content](#table-of-content)
+- [Glossary](#glossary)
+- [Project Description](#project-description)
+- [Importance](#importance)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#cli-usage)
+- [How it works?](#how-it-works)
+  - [Cyclomatic Complexity](#cyclomatic-complexity)
+  - [Halstead Complexity](#halstead-complexity)
+  - [Comments Complexity](#comments-complexity)
+  - [Code Structure Complexity](#code-structure-complexity)
+  - [Arithmetic Intricacy](#arithmetic-intricacy)
+  - [Inline Data](#inline-data)
+  - [Summing up](#summing-up)
+- [Important Note](#important-note)
+- [RUP filled template](#rup-filled-template)
+- [Authors](#authors)
 ## Glossary
 Weighted Micro Function Points ([WMFP](https://en.wikipedia.org/wiki/Weighted_Micro_Function_Points)) - a modern software sizing algorithm
 
 ## Project description
-Evaluation of WMFP metrics for given Golang code. Implemented in Go.
+Evaluation of WMFP metrics in human-minutes for given Golang code. Implemented in Go.
 
 Project developed for the course Software Systems Analysis and Design (SSAD) at Innopolis University in F21 semester.
 
@@ -18,7 +38,6 @@ Software metrics help to estimate the size, price, or time consumption of softwa
 * Ability to choose multiple files explicitly to count total metrics for them
 * Possibility to pick a folder and have all matching files summarized in metrics score
 * Recursive mode of scanning a folder
-* Program can be installed using package managers
 
 ## Installation
 ```console
