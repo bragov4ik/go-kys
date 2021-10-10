@@ -60,6 +60,12 @@ $ ./gokys -c <PATH_TO_CONFIG> a.go           # calculates for file
 $ ./gokys -c <PATH_TO_CONFIG> .              # calculates for project
 $ ./gokys -c <PATH_TO_CONFIG> a.go b.go c.go # calculates for multiple files
 ```
+## Contribution
+To contribute to the project fork the repository and make a PR.
+
+## Important Note
+Since there is no comprehensive description of the work of WMFP in open sources, some metrics were not implemented and some
+were implemented using our own vision and understanding of these metrics.
 
 ## RUP filled template
 [Link](https://docs.google.com/document/d/1su-LKhZ33DbZ898iwvInVrTbZTy12idO/edit?usp=sharing&ouid=106194539643127537689&rtpof=true&sd=true)
