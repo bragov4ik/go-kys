@@ -1,41 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
+    <arithmetic>
+        <add>0.5</add>
+        <sub>0.5</sub>
+        <mul>0.5</mul>
+        <quo>0.5</quo>
+        <rem>0.5</rem>
+        <add_assign>0.5</add_assign>
+        <sub_assign>0.5</sub_assign>
+        <mul_assign>0.5</mul_assign>
+        <quo_assign>0.5</quo_assign>
+        <rem_assign>0.5</rem_assign>
+        <inc>0.1</inc>
+        <dec>0.1</dec>
+    </arithmetic>
     <cyclomatic>
         <if>1</if>
-        <for>1</for>
+        <for>2</for>
         <rng>1</rng>
-        <case>1</case>
-        <and>1</and>
-        <or>1</or>
+        <case>2</case>
+        <and>0.5</and>
+        <or>0.5</or>
     </cyclomatic>
     <comment>
-        <word>1</word>
+        <word>0.2</word>
     </comment>
     <codestruct>
-        <func>1</func>
+        <func>3</func>
         <struct>1</struct>
         <interface>1</interface>
     </codestruct>
+    <halstead>0.1</halstead>
     <inline>
-        <int>1</int>
-        <float>1</float>
-        <imag>1</imag>
-        <char>1</char>
-        <string>1</string>
-        <composite>1</composite>
+        <int>0.1</int>
+        <float>0.1</float>
+        <imag>0.1</imag>
+        <char>0.1</char>
+        <string>0.1</string>
+        <composite>0.2</composite>
     </inline>
-    <arithmetic>
-        <add>1</add>
-        <sub>1</sub>
-        <mul>1</mul>
-        <quo>1</quo>
-        <rem>1</rem>
-        <add_assign>1</add_assign>
-        <sub_assign>1</sub_assign>
-        <mul_assign>1</mul_assign>
-        <quo_assign>1</quo_assign>
-        <rem_assign>1</rem_assign>
-        <inc>1</inc>
-        <dec>1</dec>
-    </arithmetic>
 </config>
