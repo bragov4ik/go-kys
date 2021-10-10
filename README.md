@@ -3,19 +3,16 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/bragov4ik/go-kys.svg)](https://pkg.go.dev/github.com/bragov4ik/go-kys)
 
 # Go knowledge yield summary
+## Table of Contents
 
-<img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/>
-
-## Table of Content
-
-- [Table of content](#table-of-content)
+- [Demo](#project-demo)
 - [Glossary](#glossary)
 - [Project Description](#project-description)
 - [Importance](#importance)
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#cli-usage)
-- [How it works?](#how-it-works)
+- [How it works](#how-it-works)
   - [Cyclomatic Complexity](#cyclomatic-complexity)
   - [Halstead Complexity](#halstead-complexity)
   - [Comments Complexity](#comments-complexity)
@@ -26,6 +23,10 @@
 - [Important Note](#important-note)
 - [RUP filled template](#rup-filled-template)
 - [Authors](#authors)
+
+## Project demo
+<img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/>
+
 ## Glossary
 Weighted Micro Function Points ([WMFP](https://en.wikipedia.org/wiki/Weighted_Micro_Function_Points)) - a modern software sizing algorithm
 
@@ -56,40 +57,43 @@ $ ./gokys -c <PATH_TO_CONFIG> a.go           # calculates for file
 $ ./gokys -c <PATH_TO_CONFIG> .              # calculates for project
 $ ./gokys -c <PATH_TO_CONFIG> a.go b.go c.go # calculates for multiple files
 ```
-## How it works?
+## How it works
+The algorithm calculates multiple metrics and combines them in order to get a result. The metrics are described below.
+
 ### Cyclomatic Complexity
 
 The [Cyclomatic Complexity](https://en.wikipedia.org/wiki/Cyclomatic_complexity)
-indicates the complexity of a program.
+indicates the complexity of a program's flow.
 
 This program calculates the complexities of each function by counting independent paths. It starts with the initial value
 of 1 and each time program encounters one of the `if, for, case, ||, &&` statements it increases the value by
 corresponding to the statement's weight specified in the configuration file.
 
 ### Halstead Complexity
-Calculation of Halstead Complexity can be found [here](https://en.wikipedia.org/wiki/Halstead_complexity_measures)
+Calculation of Halstead Complexity can be found [here](https://en.wikipedia.org/wiki/Halstead_complexity_measures). The formula
+for Volume is used, as it seems more appropriate for the WMFP.
 
 ### Comments Complexity
 Measures the amount of effort spent on writing program comments. It calculates the number of words written in comments
-and multiply to the word's weight specified in the configuration file
+and multiplies by a weight specified in the configuration file.
 
 ### Code Structure Complexity
 Measures the amount of effort spent on the program structure such as separating code into classes, functions, and
-interfaces. It starts with the initial value of 0 and each time program encounters structure declaration or function
-declaration or interface declaration it increases value by declaration's weight specified in the configuration file
+interfaces. It starts with the initial value of 0 and each time program encounters structure declaration, function
+declaration, or interface declaration it increases the value by the declaration's weight specified in the configuration file.
 
 ### Arithmetic Intricacy
 Measures the complexity of arithmetic calculations across the program. It starts with initial value of 0 and each time
 program encounters one of the `+ - * / % += -= *= /= %= ++ --` operators it increases value by operator's weight
-specified in configuration file
+specified in configuration file.
 
 ### Inline Data
 Measures the amount of effort spent on embedding hard-coded data. It starts with the initial value of 0 and each time
-program encounters basic literal or composite literal it increases value by literal's weight specified in the configuration
+program encounters basic or composite literal it increases value by literal's weight specified in the configuration
 file
 
 ### Summing Up
-A program sums up all the above metrics to calculate total effort in human-minutes.
+The program sums up all the above metrics to calculate total effort in human-minutes.
 
 ## Contribution
 To contribute to the project fork the repository and make a PR.
