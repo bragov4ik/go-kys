@@ -1,3 +1,4 @@
+// Metric for inline data complexity measurement
 package inline
 
 import (
@@ -5,32 +6,41 @@ import (
 	"go/token"
 )
 
+// Weight of different data complexity
 type Weights struct {
-	Int          float64 `xml:"int"`
-	Float        float64 `xml:"float"`
-	Imag         float64 `xml:"imag"`
-	Char         float64 `xml:"char"`
-	String       float64 `xml:"string"`
+	// Integer constants complexity
+	Int float64 `xml:"int"`
+	// Float constants complexity
+	Float float64 `xml:"float"`
+	// Imaginary numbers constants complexity
+	Imag float64 `xml:"imag"`
+	// Characters constants complexity
+	Char float64 `xml:"char"`
+	// Strings constants complexity
+	String float64 `xml:"string"`
+	// Composite literals (like structure initialization) constants complexity
 	CompositeLit float64 `xml:"composite"`
 }
 
+// Intermidiate state of metric
 type Metric struct {
+	// Config with all metric's weights
 	Config Weights
-	Comp   float64
+	comp   float64
 }
 
+// Parses ast node and collects all info about inlined constants in code
 func (m *Metric) ParseNode(n ast.Node) {
 	switch v := n.(type) {
 	case *ast.BasicLit:
-		m.Comp += getBasicLitComp(v, &m.Config)
+		m.comp += getBasicLitComp(v, &m.Config)
 	case *ast.CompositeLit:
-		m.Comp += m.Config.CompositeLit
+		m.comp += m.Config.CompositeLit
 	}
 }
 
-func (m Metric) Finish() float64 {
-	return m.Comp
-}
+// Returns final metric's result
+func (m Metric) Finish() float64 { return m.comp }
 
 func getBasicLitComp(literal *ast.BasicLit, config *Weights) float64 {
 	var comp float64

@@ -1,3 +1,4 @@
+// Package with [Halstead complexity measures](https://en.wikipedia.org/wiki/Halstead_complexity_measures)
 package halstead
 
 import (
@@ -6,11 +7,13 @@ import (
 	"math"
 )
 
+// Intermidiate state of metric
 type Metric struct {
 	operators map[token.Token]uint
 	operands  map[string]uint
 }
 
+// Constructor of metric
 func NewMetric() Metric {
 	return Metric{
 		operators: make(map[token.Token]uint),
@@ -18,6 +21,7 @@ func NewMetric() Metric {
 	}
 }
 
+// Parses node and collects all metric scores
 func (m *Metric) ParseNode(n ast.Node) {
 	switch v := n.(type) {
 	case *ast.AssignStmt:
@@ -105,6 +109,7 @@ func (m *Metric) ParseNode(n ast.Node) {
 	}
 }
 
+// Returns final result of metric
 func (m Metric) Finish() float64 {
 	n1 := float64(m.n1Distinct())
 	n2 := float64(m.n2Distinct())

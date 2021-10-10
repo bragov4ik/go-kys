@@ -1,23 +1,30 @@
+// Package with metric which checks general code structure.
 package codestruct
 
-import (
-	"go/ast"
-)
+import "go/ast"
 
+// Weights for metric
 type Weights struct {
-	Func      float64 `xml:"func"`
-	Struct    float64 `xml:"struct"`
+	// Function declaration weight
+	Func float64 `xml:"func"`
+	// Structure declaration weight
+	Struct float64 `xml:"struct"`
+	// Interface declaration weight
 	Interface float64 `xml:"interface"`
 }
 
+// Intermidiate state for code structure metric
 type Metric struct {
+	// Config with weights
 	Config Weights
-	Comp   float64
+	comp   float64
 }
 
-func (m *Metric) ParseNode(n ast.Node) {
-	m.Comp += getCodeStructComp(n, &m.Config)
-}
+// Parses ast node and collects result of metric
+func (m *Metric) ParseNode(n ast.Node) { m.comp += getCodeStructComp(n, &m.Config) }
+
+// Returns final result of metric
+func (m *Metric) Finish() float64 { return m.comp }
 
 func getCodeStructComp(n ast.Node, cfg *Weights) float64 {
 	var comp float64
@@ -32,8 +39,4 @@ func getCodeStructComp(n ast.Node, cfg *Weights) float64 {
 	}
 
 	return comp
-}
-
-func (m Metric) Finish() float64 {
-	return float64(m.Comp)
 }

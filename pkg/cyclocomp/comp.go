@@ -1,3 +1,4 @@
+// Checks cyclo complexity of code using metric
 package cyclo
 
 import (
@@ -5,30 +6,38 @@ import (
 	"go/token"
 )
 
+// Config for metric with various weights for syntactical structures
 type Weights struct {
-	If   float64 `xml:"if"`
-	For  float64 `xml:"for"`
-	Rng  float64 `xml:"rng"`
+	// If weight
+	If float64 `xml:"if"`
+	// For weight
+	For float64 `xml:"for"`
+	// Range weight
+	Rng float64 `xml:"rng"`
+	// Case weight
 	Case float64 `xml:"case"`
-	And  float64 `xml:"and"`
-	Or   float64 `xml:"or"`
+	// Boolean and weight
+	And float64 `xml:"and"`
+	// Boolean or weight
+	Or float64 `xml:"or"`
 }
 
+// Intermidiate state of metric
 type Metric struct {
+	// Config with weights
 	Config Weights
-	Comp   float64
+	comp   float64
 }
 
+// Parses ast node and collects all of its metrics
 func (m *Metric) ParseNode(n ast.Node) {
-	v, ok := n.(*ast.FuncDecl)
-	if ok {
-		m.Comp += getCycloComp(v, &m.Config)
+	if v, ok := n.(*ast.FuncDecl); ok {
+		m.comp += getCycloComp(v, &m.Config)
 	}
 }
 
-func (m Metric) Finish() float64 {
-	return m.Comp
-}
+// Returns final score
+func (m Metric) Finish() float64 { return m.comp }
 
 type branchVisitor func(n ast.Node) (w ast.Visitor)
 

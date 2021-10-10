@@ -1,8 +1,9 @@
+// Package with [wmfp](https://en.wikipedia.org/wiki/Weighted_Micro_Function_Points) metric
+// calculator.
 package wmfp
 
 import (
 	"go/ast"
-	"reflect"
 
 	"github.com/bragov4ik/go-kys/pkg/arithmetic"
 	codestruct "github.com/bragov4ik/go-kys/pkg/codestruct"
@@ -12,30 +13,49 @@ import (
 	inline "github.com/bragov4ik/go-kys/pkg/inline"
 )
 
+// State for WMFP metrics
 type MeasurerWMFP struct {
-	Comments       *comments.Metric
-	Cyclo          *cyclo.Metric
-	Halst          *halstead.Metric
-	HalstWeight    float64
-	Codestruct     *codestruct.Metric
-	InlineData     *inline.Metric
+	// State of comments metrics
+	Comments *comments.Metric
+	// State of cyclo complexity metrics
+	Cyclo *cyclo.Metric
+	// State of halstead metrics
+	Halst *halstead.Metric
+	// State of complexity of code structure
+	Codestruct *codestruct.Metric
+	// State of complexity of inline data constants
+	InlineData *inline.Metric
+	// State of complexity of arithmetic expressions
 	ArithmeticComp *arithmetic.Metric
+
+	halstWeight float64
 }
 
+// Interface for underlaying metrics
 type Metric interface {
+	// Parses ast node and collects all info for metric
 	ParseNode(ast.Node)
+	// Returns final score for metric
 	Finish() float64
 }
 
+// Config with all weights for underlaying metrics
 type Config struct {
-	CycloComp      cyclo.Weights      `xml:"cyclomatic"`
-	Comment        comments.Weights   `xml:"comment"`
+	// Cyclo complexity weights
+	CycloComp cyclo.Weights `xml:"cyclomatic"`
+	// Comments complexity weights
+	Comment comments.Weights `xml:"comment"`
+	// Code structure complexity weights
 	CodeStructComp codestruct.Weights `xml:"codestruct"`
-	InlineData     inline.Weights     `xml:"inline"`
+	// Inline data complexity weights
+	InlineData inline.Weights `xml:"inline"`
+	// Arithmetic expression complexity weights
 	ArithmeticComp arithmetic.Weights `xml:"arithmetic"`
-	Halstead       float64            `xml:"halstead"`
+	// Halstead metric weight
+	Halstead float64 `xml:"halstead"`
 }
 
+// Constructor for WMFP metric
 func NewMeasurerWMFP(config *Config) MeasurerWMFP {
 	halst := halstead.NewMetric()
 	return MeasurerWMFP{
@@ -55,10 +75,11 @@ func NewMeasurerWMFP(config *Config) MeasurerWMFP {
 		ArithmeticComp: &arithmetic.Metric{
 			Config: config.ArithmeticComp,
 		},
-		HalstWeight: config.Halstead,
+		halstWeight: config.Halstead,
 	}
 }
 
+// Parses single file using WMFP metric
 func (m *MeasurerWMFP) ParseFile(file *ast.File) {
 	ast.Inspect(file, func(n ast.Node) bool {
 		m.parseNode(n)
@@ -66,21 +87,30 @@ func (m *MeasurerWMFP) ParseFile(file *ast.File) {
 	})
 }
 
+// Returns final score of metric
 func (m *MeasurerWMFP) Finish() (total float64) {
 	total += m.Comments.Finish()
 	total += m.Cyclo.Finish()
-	total += m.Halst.Finish() * m.HalstWeight
+	total += m.Halst.Finish() * m.halstWeight
 	total += m.Codestruct.Finish()
 	total += m.InlineData.Finish()
 	total += m.ArithmeticComp.Finish()
 	return
 }
 
+func (m *MeasurerWMFP) metrics() []Metric {
+	return []Metric{
+		m.Comments,
+		m.Cyclo,
+		m.Halst,
+		m.Codestruct,
+		m.InlineData,
+		m.ArithmeticComp,
+	}
+}
+
 func (measurer *MeasurerWMFP) parseNode(n ast.Node) {
-	v := reflect.ValueOf(*measurer)
-	for i := 0; i < v.NumField(); i++ {
-		if m, ok := v.Field(i).Interface().(Metric); ok {
-			m.ParseNode(n)
-		}
+	for _, m := range measurer.metrics() {
+		m.ParseNode(n)
 	}
 }
