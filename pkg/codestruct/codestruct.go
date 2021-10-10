@@ -5,22 +5,22 @@ import (
 )
 
 type Weights struct {
-	Func      uint `xml:"func"`
-	Struct    uint `xml:"struct"`
-	Interface uint `xml:"interface"`
+	Func      float64 `xml:"func"`
+	Struct    float64 `xml:"struct"`
+	Interface float64 `xml:"interface"`
 }
 
 type Metric struct {
 	Config Weights
-	Comp   uint
+	Comp   float64
 }
 
 func (m *Metric) ParseNode(n ast.Node) {
 	m.Comp += getCodeStructComp(n, &m.Config)
 }
 
-func getCodeStructComp(n ast.Node, cfg *Weights) uint {
-	comp := uint(0)
+func getCodeStructComp(n ast.Node, cfg *Weights) float64 {
+	var comp float64
 
 	switch n.(type) {
 	case *ast.StructType:

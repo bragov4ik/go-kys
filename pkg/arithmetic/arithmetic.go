@@ -6,23 +6,23 @@ import (
 )
 
 type Weights struct {
-	Add       uint `xml:"add"`
-	Sub       uint `xml:"sub"`
-	Mul       uint `xml:"mul"`
-	Quo       uint `xml:"quo"`
-	Rem       uint `xml:"rem"`
-	AddAssign uint `xml:"add_assign"`
-	SubAssign uint `xml:"sub_assign"`
-	MulAssign uint `xml:"mul_assign"`
-	QuoAssign uint `xml:"quo_assign"`
-	RemAssign uint `xml:"rem_assign"`
-	Inc       uint `xml:"inc"`
-	Dec       uint `xml:"dec"`
+	Add       float64 `xml:"add"`
+	Sub       float64 `xml:"sub"`
+	Mul       float64 `xml:"mul"`
+	Quo       float64 `xml:"quo"`
+	Rem       float64 `xml:"rem"`
+	AddAssign float64 `xml:"add_assign"`
+	SubAssign float64 `xml:"sub_assign"`
+	MulAssign float64 `xml:"mul_assign"`
+	QuoAssign float64 `xml:"quo_assign"`
+	RemAssign float64 `xml:"rem_assign"`
+	Inc       float64 `xml:"inc"`
+	Dec       float64 `xml:"dec"`
 }
 
 type Metric struct {
 	Config Weights
-	Comp   uint
+	Comp   float64
 }
 
 func (m *Metric) ParseNode(n ast.Node) {
@@ -30,11 +30,11 @@ func (m *Metric) ParseNode(n ast.Node) {
 }
 
 func (m Metric) Finish() float64 {
-	return float64(m.Comp)
+	return m.Comp
 }
 
-func getArithmeticComp(n *ast.Node, config *Weights) uint {
-	var comp uint
+func getArithmeticComp(n *ast.Node, config *Weights) float64 {
+	var comp float64
 	switch v := (*n).(type) {
 	case *ast.BinaryExpr:
 		comp = getBinaryComp(v, config)
@@ -48,8 +48,8 @@ func getArithmeticComp(n *ast.Node, config *Weights) uint {
 	return comp
 }
 
-func getBinaryComp(n *ast.BinaryExpr, config *Weights) uint {
-	var comp uint
+func getBinaryComp(n *ast.BinaryExpr, config *Weights) float64 {
+	var comp float64
 	switch n.Op {
 	case token.ADD:
 		comp = config.Add
@@ -65,8 +65,8 @@ func getBinaryComp(n *ast.BinaryExpr, config *Weights) uint {
 	return comp
 }
 
-func getUnaryComp(n *ast.UnaryExpr, config *Weights) uint {
-	var comp uint
+func getUnaryComp(n *ast.UnaryExpr, config *Weights) float64 {
+	var comp float64
 	switch n.Op {
 	case token.ADD:
 		comp = config.Add
@@ -76,8 +76,8 @@ func getUnaryComp(n *ast.UnaryExpr, config *Weights) uint {
 	return comp
 }
 
-func getIncDecComp(n *ast.IncDecStmt, config *Weights) uint {
-	var comp uint
+func getIncDecComp(n *ast.IncDecStmt, config *Weights) float64 {
+	var comp float64
 	switch n.Tok {
 	case token.INC:
 		comp = config.Inc
@@ -87,8 +87,8 @@ func getIncDecComp(n *ast.IncDecStmt, config *Weights) uint {
 	return comp
 }
 
-func getAssignComp(n *ast.AssignStmt, config *Weights) uint {
-	var comp uint
+func getAssignComp(n *ast.AssignStmt, config *Weights) float64 {
+	var comp float64
 	switch n.Tok {
 	case token.ADD_ASSIGN:
 		comp = config.AddAssign

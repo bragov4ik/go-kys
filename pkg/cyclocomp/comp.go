@@ -6,17 +6,17 @@ import (
 )
 
 type Weights struct {
-	If   uint `xml:"if"`
-	For  uint `xml:"for"`
-	Rng  uint `xml:"rng"`
-	Case uint `xml:"case"`
-	And  uint `xml:"and"`
-	Or   uint `xml:"or"`
+	If   float64 `xml:"if"`
+	For  float64 `xml:"for"`
+	Rng  float64 `xml:"rng"`
+	Case float64 `xml:"case"`
+	And  float64 `xml:"and"`
+	Or   float64 `xml:"or"`
 }
 
 type Metric struct {
 	Config Weights
-	Comp   uint
+	Comp   float64
 }
 
 func (m *Metric) ParseNode(n ast.Node) {
@@ -27,7 +27,7 @@ func (m *Metric) ParseNode(n ast.Node) {
 }
 
 func (m Metric) Finish() float64 {
-	return float64(m.Comp)
+	return m.Comp
 }
 
 type branchVisitor func(n ast.Node) (w ast.Visitor)
@@ -36,8 +36,8 @@ func (v branchVisitor) Visit(n ast.Node) (w ast.Visitor) {
 	return v(n)
 }
 
-func getCycloComp(fd *ast.FuncDecl, config *Weights) uint {
-	var comp uint = 1
+func getCycloComp(fd *ast.FuncDecl, config *Weights) float64 {
+	var comp float64 = 1
 	var v ast.Visitor
 	v = branchVisitor(func(n ast.Node) (w ast.Visitor) {
 		switch n := n.(type) {

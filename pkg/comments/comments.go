@@ -6,12 +6,12 @@ import (
 )
 
 type Weights struct {
-	Word uint `xml:"word"`
+	Word float64 `xml:"word"`
 }
 
 type Metric struct {
 	Config Weights
-	Score  uint
+	Score  float64
 }
 
 func (m *Metric) ParseNode(n ast.Node) {
@@ -22,9 +22,9 @@ func (m *Metric) ParseNode(n ast.Node) {
 }
 
 func (m Metric) Finish() float64 {
-	return float64(m.Score)
+	return m.Score
 }
 
-func getCommentComp(comment *ast.Comment, config *Weights) uint {
-	return uint(len(strings.Fields(comment.Text))) * config.Word
+func getCommentComp(comment *ast.Comment, config *Weights) float64 {
+	return float64(len(strings.Fields(comment.Text))) * config.Word
 }
