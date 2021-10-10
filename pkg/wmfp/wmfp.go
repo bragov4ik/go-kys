@@ -27,7 +27,7 @@ type Metric interface {
 }
 
 type Config struct {
-	CycloComp      cyclo.Weights      `xml:"cyclomatic"`
+	cyclo.Weights  `xml:"cyclomatic"`
 	Comment        comments.Weights   `xml:"comment"`
 	CodeStructComp codestruct.Weights `xml:"codestruct"`
 	InlineData     inline.Weights     `xml:"inline"`
