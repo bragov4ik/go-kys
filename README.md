@@ -3,9 +3,12 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/bragov4ik/go-kys.svg)](https://pkg.go.dev/github.com/bragov4ik/go-kys)
 
 # Go knowledge yield summary
+
+## Project demo
+<img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/>
+
 ## Table of Contents
 
-- [Demo](#project-demo)
 - [Glossary](#glossary)
 - [Project Description](#project-description)
 - [Importance](#importance)
@@ -23,9 +26,6 @@
 - [Important Note](#important-note)
 - [RUP filled template](#rup-filled-template)
 - [Authors](#authors)
-
-## Project demo
-<img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/>
 
 ## Glossary
 Weighted Micro Function Points ([WMFP](https://en.wikipedia.org/wiki/Weighted_Micro_Function_Points)) - a modern software sizing algorithm
