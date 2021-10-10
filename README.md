@@ -64,7 +64,7 @@ program encounters basic literal or composite literal it increases value by lite
 file
 
 ### Summing Up
-A program sums up all the above metrics to calculate total effort.
+A program sums up all the above metrics to calculate total effort in human-minutes.
 
 ## Contribution
 To contribute to the project fork the repository and make a PR.
