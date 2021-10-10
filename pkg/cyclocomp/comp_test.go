@@ -33,7 +33,7 @@ func TestCycloComp1(t *testing.T) {
 		switch v := n.(type) {
 		case *ast.FuncDecl:
 			want := uint(3)
-			got := getCycloComp(v, &Weights{If: 1})
+			got := uint(getCycloComp(v, &Weights{If: 1}))
 
 			if got != want {
 				t.Fatalf(`GetCycloComp("package main...") = %v, Wanted %v`, got, want)

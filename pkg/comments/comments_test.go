@@ -26,8 +26,8 @@ func TestLorem(t *testing.T) {
 	}
 
 	nwords := uint(76)
-	weight := uint(2)
-	want := nwords * weight
+	weight := 2.
+	want := uint(float64(nwords) * weight)
 
 	m := Metric{Config: Weights{Word: weight}}
 
