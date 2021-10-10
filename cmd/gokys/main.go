@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/xml"
 	"flag"
+	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"log"
@@ -13,7 +14,6 @@ import (
 	"go/token"
 
 	"github.com/bragov4ik/go-kys/pkg/wmfp"
-	"github.com/k0kubun/pp/v3"
 )
 
 var cfgpath = flag.String("c", "config.xml", "XML config")
@@ -61,7 +61,7 @@ func main() {
 		measurer.ParseFile(node)
 	}
 
-	pp.Println(measurer.Finish())
+	fmt.Println(measurer.Finish())
 }
 
 func walkMatch(root, pattern string) ([]string, error) {
