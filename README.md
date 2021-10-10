@@ -1,3 +1,6 @@
+[![Actions Status](https://github.com/bragov4ik/go-kys/workflows/build/badge.svg)](https://github.com/bragov4ik/go-kys/actions)
+[![codecov](https://codecov.io/gh/bragov4ik/go-kys/branch/master/graph/badge.svg)](https://codecov.io/gh/bragov4ik/go-kys)
+
 # Go knowledge yield summary
 
 <img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/>
