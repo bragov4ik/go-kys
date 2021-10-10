@@ -85,7 +85,7 @@ func TestWMFP(t *testing.T) {
 	}
 
 	m.ParseFile(file)
-	var expect uint = 62
+	var expect uint = 364
 
 	if got := m.Finish(); uint(got) != expect {
 		t.Errorf("Finish = %v, want %v", got, expect)

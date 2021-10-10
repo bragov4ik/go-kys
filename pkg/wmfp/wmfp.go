@@ -55,6 +55,7 @@ func NewMeasurerWMFP(config *Config) MeasurerWMFP {
 		ArithmeticComp: &arithmetic.Metric{
 			Config: config.ArithmeticComp,
 		},
+		HalstWeight: config.Halstead,
 	}
 }
 
