@@ -18,6 +18,19 @@ Software metrics help to estimate the size, price, or time consumption of softwa
 * Recursive mode of scanning a folder
 * Program can be installed using package managers
 
+## Installation
+```console
+$ go install github.com/bragov4ik/go-kys/cmd/gokys@latest
+```
+
+## CLI Usage
+Default path to config file is `config.xml`
+```console
+$ cd $HOME/go/bin
+$ ./gokys -c <PATH_TO_CONFIG> a.go           # calculates for file
+$ ./gokys -c <PATH_TO_CONFIG> .              # calculates for project
+$ ./gokys -c <PATH_TO_CONFIG> a.go b.go c.go # calculates for multiple files
+```
 ## How it works?
 ### Cyclomatic Complexity
 
@@ -53,13 +66,6 @@ file
 ### Summing Up
 A program sums up all the above metrics to calculate total effort.
 
-## CLI Usage
-Default path to config file is `config.xml`
-```console
-$ ./gokys -c <PATH_TO_CONFIG> a.go           # calculates for file
-$ ./gokys -c <PATH_TO_CONFIG> .              # calculates for project
-$ ./gokys -c <PATH_TO_CONFIG> a.go b.go c.go # calculates for multiple files
-```
 ## Contribution
 To contribute to the project fork the repository and make a PR.
 
