@@ -35,9 +35,8 @@ func TestLorem(t *testing.T) {
 		m.ParseNode(n)
 		return true
 	})
-	m.Finish()
 
-	got := m.Score
+	got := uint(m.Finish())
 
 	if want != got {
 		t.Fatalf(`GetCommentComp("Lorem ipsum...") = %v, Wanted %v`, got, want)

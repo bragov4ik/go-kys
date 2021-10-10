@@ -72,10 +72,9 @@ func TestCycloComp2(t *testing.T) {
 		m.ParseNode(n)
 		return true
 	})
-	m.Finish()
 
 	want := uint(10)
-	got := m.Comp
+	got := uint(m.Finish())
 
 	if got != want {
 		t.Fatalf(`GetCycloComp("package main...") = %v, Wanted %v`, got, want)

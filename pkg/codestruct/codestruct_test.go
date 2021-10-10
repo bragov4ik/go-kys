@@ -31,9 +31,8 @@ func TestCodeStructComp(t *testing.T) {
 		m.ParseNode(n)
 		return true
 	})
-	m.Finish()
 
-	got := m.Comp
+	got := uint(m.Finish())
 	want := uint(6)
 	if want != got {
 		t.Errorf("TestCodeStructComp got %v, want %v", got, want)
