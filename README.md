@@ -54,6 +54,7 @@ file
 A program sum up all the above metrics to calculate total effort.
 
 ## CLI Usage
+Default path to config file is `config.xml`
 ```console
 $ ./gokys -c <PATH_TO_CONFIG> a.go           # calculates for file
 $ ./gokys -c <PATH_TO_CONFIG> .              # calculates for project
