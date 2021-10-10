@@ -41,7 +41,7 @@ func NewMeasurerWMFP(config *Config) MeasurerWMFP {
 			Config: config.Comment,
 		},
 		Cyclo: &cyclo.Metric{
-			Config: config.CycloComp,
+			Config: config.Weights,
 		},
 		Halst: &halst,
 		Codestruct: &codestruct.Metric{
