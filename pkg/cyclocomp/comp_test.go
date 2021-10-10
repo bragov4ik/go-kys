@@ -66,16 +66,17 @@ func TestCycloComp2(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	ast.Inspect(expr, func(n ast.Node) bool {
-		switch v := n.(type) {
-		case *ast.FuncDecl:
-			want := uint(10)
-			got := getCycloComp(v, &Weights{If: 1, For: 1, Case: 1, Rng: 1, And: 1, Or: 1})
+	m := Metric{Config: Weights{If: 1, For: 1, Case: 1, Rng: 1, And: 1, Or: 1}}
 
-			if got != want {
-				t.Fatalf(`GetCycloComp("package main...") = %v, Wanted %v`, got, want)
-			}
-		}
+	ast.Inspect(expr, func(n ast.Node) bool {
+		m.ParseNode(n)
 		return true
 	})
+
+	want := uint(10)
+	got := uint(m.Finish())
+
+	if got != want {
+		t.Fatalf(`GetCycloComp("package main...") = %v, Wanted %v`, got, want)
+	}
 }

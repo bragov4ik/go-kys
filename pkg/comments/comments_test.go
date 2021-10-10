@@ -2,25 +2,43 @@ package comments
 
 import (
 	"go/ast"
+	"go/parser"
+	"go/token"
 	"testing"
 )
 
-/// Test with predefined string
-func TestLoremIpsum(t *testing.T) {
-	comment := ast.Comment{}
-	comment.Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
-	comment.Text += "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
-	comment.Text += "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris "
-	comment.Text += "nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in "
-	comment.Text += "reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. "
-	comment.Text += "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+/// Test with a predefined string
+func TestLorem(t *testing.T) {
+	src := `package main
 
-	nwords := uint(69)
+			// Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+			// sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+			// Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+			// nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+			// reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+			// Excepteur sint occaecat cupidatat non proident,
+			// sunt in culpa qui officia deserunt mollit anim id est laborum.
+			func main(){}`
+
+	file, err := parser.ParseFile(token.NewFileSet(), "", src, parser.ParseComments)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	nwords := uint(76)
 	weight := uint(2)
 	want := nwords * weight
 
-	got := getCommentComp(&comment, &Weights{weight})
-	if got != want {
+	m := Metric{Config: Weights{Word: weight}}
+
+	ast.Inspect(file, func(n ast.Node) bool {
+		m.ParseNode(n)
+		return true
+	})
+
+	got := uint(m.Finish())
+
+	if want != got {
 		t.Fatalf(`GetCommentComp("Lorem ipsum...") = %v, Wanted %v`, got, want)
 	}
 }
