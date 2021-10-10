@@ -1,5 +1,7 @@
 # Go knowledge yield summary
 
+<img alt="asciicast" src="https://asciinema.org/a/gF52rkEfwDs1TNpK0d8PCNQqq.svg" width="600"/>
+
 ## Glossary
 Weighted Micro Function Points ([WMFP](https://en.wikipedia.org/wiki/Weighted_Micro_Function_Points)) - a modern software sizing algorithm
 
