@@ -52,16 +52,30 @@ func main() {
 	cfg := readCfg()
 	files := getFiles(flag.Args())
 
-	fset := token.NewFileSet()
-	measurer := wmfp.NewMeasurerWMFP(&cfg)
-
+	measurers := make(chan *wmfp.MeasurerWMFP, len(files))
 	for _, file := range files {
-		node, err := parser.ParseFile(fset, file, nil, parser.ParseComments)
-		die(err)
-		measurer.ParseFile(node)
+		go measureFile(file, cfg, measurers)
 	}
 
-	fmt.Println(measurer.Finish())
+	fmt.Println(combineMeasures(measurers, len(files)))
+}
+
+func measureFile(file string, config wmfp.Config, results chan<- *wmfp.MeasurerWMFP) {
+	measurer := wmfp.NewMeasurerWMFP(&config)
+	node, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.ParseComments)
+	die(err)
+	measurer.ParseFile(node)
+	results <- &measurer
+}
+
+func combineMeasures(results <-chan *wmfp.MeasurerWMFP, mNum int) float64 {
+	var nextMeasurer *wmfp.MeasurerWMFP
+	var totalScore float64
+	for i := 0; i < mNum; i++ {
+		nextMeasurer = <-results
+		totalScore += nextMeasurer.Finish()
+	}
+	return totalScore
 }
 
 func walkMatch(root, pattern string) ([]string, error) {
