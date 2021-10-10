@@ -102,7 +102,7 @@ To contribute to the project fork the repository and make a PR.
 Since there is no comprehensive description of the work of WMFP in open sources, some metrics were not implemented and some
 were implemented using our vision and understanding of these metrics.
 
-## RUP filled template
+## RUP artifact
 [Link](https://docs.google.com/document/d/1su-LKhZ33DbZ898iwvInVrTbZTy12idO/edit?usp=sharing&ouid=106194539643127537689&rtpof=true&sd=true)
 
 ## Authors
