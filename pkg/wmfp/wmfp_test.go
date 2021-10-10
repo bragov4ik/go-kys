@@ -75,6 +75,7 @@ func TestWMFP(t *testing.T) {
 			Inc:       1,
 			Dec:       1,
 		},
+		Halstead: 1,
 	}
 
 	m := NewMeasurerWMFP(&cfg)
@@ -84,7 +85,9 @@ func TestWMFP(t *testing.T) {
 	}
 
 	m.ParseFile(file)
-	if got := m.Finish(); uint(got) != 364 {
-		t.Errorf("Finish = %v, want %v", got, 364)
+	var expect uint = 62
+
+	if got := m.Finish(); uint(got) != expect {
+		t.Errorf("Finish = %v, want %v", got, expect)
 	}
 }

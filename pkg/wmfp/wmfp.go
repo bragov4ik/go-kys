@@ -16,6 +16,7 @@ type MeasurerWMFP struct {
 	Comments       *comments.Metric
 	Cyclo          *cyclo.Metric
 	Halst          *halstead.Metric
+	HalstWeight    float64
 	Codestruct     *codestruct.Metric
 	InlineData     *inline.Metric
 	ArithmeticComp *arithmetic.Metric
@@ -32,6 +33,7 @@ type Config struct {
 	CodeStructComp codestruct.Weights `xml:"codestruct"`
 	InlineData     inline.Weights     `xml:"inline"`
 	ArithmeticComp arithmetic.Weights `xml:"arithmetic"`
+	Halstead       float64            `xml:"halstead"`
 }
 
 func NewMeasurerWMFP(config *Config) MeasurerWMFP {
@@ -63,13 +65,13 @@ func (m *MeasurerWMFP) ParseFile(file *ast.File) {
 	})
 }
 
-func (measurer *MeasurerWMFP) Finish() (total float64) {
-	v := reflect.ValueOf(*measurer)
-	for i := 0; i < v.NumField(); i++ {
-		if m, ok := v.Field(i).Interface().(Metric); ok {
-			total += m.Finish()
-		}
-	}
+func (m *MeasurerWMFP) Finish() (total float64) {
+	total += m.Comments.Finish()
+	total += m.Cyclo.Finish()
+	total += m.Halst.Finish() * m.HalstWeight
+	total += m.Codestruct.Finish()
+	total += m.InlineData.Finish()
+	total += m.ArithmeticComp.Finish()
 	return
 }
 
