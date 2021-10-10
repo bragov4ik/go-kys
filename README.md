@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/bragov4ik/go-kys/workflows/master.yml/badge.svg)](https://github.com/bragov4ik/go-kys/actions)
+[![Actions Status](https://github.com/bragov4ik/go-kys/actions/workflows/master.yml/badge.svg)](https://github.com/bragov4ik/go-kys/actions)
 [![codecov](https://codecov.io/gh/bragov4ik/go-kys/branch/master/graph/badge.svg)](https://codecov.io/gh/bragov4ik/go-kys)
 [![Go Reference](https://pkg.go.dev/badge/github.com/bragov4ik/go-kys.svg)](https://pkg.go.dev/github.com/bragov4ik/go-kys)
 

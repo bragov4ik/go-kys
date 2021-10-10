@@ -1,3 +1,5 @@
+// Package arithmetic calculates time spend on writing arithmetic
+// expressions.
 package arithmetic
 
 import (
@@ -5,33 +7,46 @@ import (
 	"go/token"
 )
 
+// Weights is structure with weights for arithmetic metric calculator
 type Weights struct {
-	Add       float64 `xml:"add"`
-	Sub       float64 `xml:"sub"`
-	Mul       float64 `xml:"mul"`
-	Quo       float64 `xml:"quo"`
-	Rem       float64 `xml:"rem"`
+	// Weight for addition
+	Add float64 `xml:"add"`
+	// Weight for subtraction
+	Sub float64 `xml:"sub"`
+	// Weight for multiplication
+	Mul float64 `xml:"mul"`
+	// Weight for division
+	Quo float64 `xml:"quo"`
+	// Weight for remainder of division
+	Rem float64 `xml:"rem"`
+	// Weight for addition assigned
 	AddAssign float64 `xml:"add_assign"`
+	// Weight for subtraction assigned
 	SubAssign float64 `xml:"sub_assign"`
+	// Weight for multiplication assigned
 	MulAssign float64 `xml:"mul_assign"`
+	// Weight for division assigned
 	QuoAssign float64 `xml:"quo_assign"`
+	// Weight for remainder assigned
 	RemAssign float64 `xml:"rem_assign"`
-	Inc       float64 `xml:"inc"`
-	Dec       float64 `xml:"dec"`
+	// Weight for increment by 1
+	Inc float64 `xml:"inc"`
+	// Weight for decrement by 1
+	Dec float64 `xml:"dec"`
 }
 
+// Metric is the temporal state for calculations of metrics
 type Metric struct {
+	// Config with weights
 	Config Weights
-	Comp   float64
+	comp   float64
 }
 
-func (m *Metric) ParseNode(n ast.Node) {
-	m.Comp += getArithmeticComp(&n, &m.Config)
-}
+// Parses node from ast
+func (m *Metric) ParseNode(n ast.Node) { m.comp += getArithmeticComp(&n, &m.Config) }
 
-func (m Metric) Finish() float64 {
-	return m.Comp
-}
+// Finishes calculation and returns result
+func (m Metric) Finish() float64 { return m.comp }
 
 func getArithmeticComp(n *ast.Node, config *Weights) float64 {
 	var comp float64

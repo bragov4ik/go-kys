@@ -1,3 +1,4 @@
+// Package with metric which checks comment complexity
 package comments
 
 import (
@@ -5,25 +6,28 @@ import (
 	"strings"
 )
 
+// Config for metric
 type Weights struct {
+	// Weight of each word in every comment
 	Word float64 `xml:"word"`
 }
 
+// Intermidiate state of metric
 type Metric struct {
+	// Config with weights
 	Config Weights
-	Score  float64
+	score  float64
 }
 
+// Parses ast node and collects metric result
 func (m *Metric) ParseNode(n ast.Node) {
-	v, ok := n.(*ast.Comment)
-	if ok {
-		m.Score += getCommentComp(v, &m.Config)
+	if v, ok := n.(*ast.Comment); ok {
+		m.score += getCommentComp(v, &m.Config)
 	}
 }
 
-func (m Metric) Finish() float64 {
-	return m.Score
-}
+// Returns metric result
+func (m Metric) Finish() float64 { return m.score }
 
 func getCommentComp(comment *ast.Comment, config *Weights) float64 {
 	return float64(len(strings.Fields(comment.Text))) * config.Word
