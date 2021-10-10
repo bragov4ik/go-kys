@@ -60,7 +60,7 @@ func main() {
 	fmt.Println(combineMeasures(measurers, len(files)))
 }
 
-func measureFile(file string, config wmfp.Config, results chan *wmfp.MeasurerWMFP) {
+func measureFile(file string, config wmfp.Config, results chan<- *wmfp.MeasurerWMFP) {
 	measurer := wmfp.NewMeasurerWMFP(&config)
 	node, err := parser.ParseFile(token.NewFileSet(), file, nil, parser.ParseComments)
 	die(err)
@@ -68,7 +68,7 @@ func measureFile(file string, config wmfp.Config, results chan *wmfp.MeasurerWMF
 	results <- &measurer
 }
 
-func combineMeasures(results chan *wmfp.MeasurerWMFP, mNum int) float64 {
+func combineMeasures(results <-chan *wmfp.MeasurerWMFP, mNum int) float64 {
 	var nextMeasurer *wmfp.MeasurerWMFP
 	var totalScore float64
 	for i := 0; i < mNum; i++ {
